@@ -1,0 +1,10 @@
+[project]
+name = "cursopythonib-proy-termo"
+version = "0.1.0"
+requires-python = ">=3.15"
+dependencies = [
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.4",
+    "scipy>=1.18.1",
+    "thermochem>=0.9.0",
+]
