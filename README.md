@@ -27,13 +27,19 @@ El proyecto busca comparar datos termodinámicos del agua como vapor sobrecalent
 
 ## Organización
 
-Lectura de datos: leer de internet y bajarlos a un directorio o leerlos del directorio (en caso de que ya estén bajados los datos)
+Carlos:
+Lectura de datos: leer de internet y bajarlos a un directorio o leerlos del directorio (en caso de que ya estén bajados los datos) 
+-------------------------------------------------------------------------------
 
+Jazmin:
 Interpolación de los datos: 
     -Se puede usar : np.interp (numpy), scipy.interpolate o DataFrame.interpolate (pandas)
     -obtener curvas para graficar, ej h vs P en curvas isotérmicas
     -tablas con algunas propiedades. Se debe poder elegir el rango, la cantidad de datos fija, como opción refinar el paso. 
+    -Salidas finales: gráficos y las tablas. Decidir como guardarlas.
+-------------------------------------------------------------------------------
 
-Salidas finales: gráficos y las tablas. Decidir como guardarlas.
+Carolina:
+Utilizar los paquetes de termodinámica cargados: coolprop, thermochem, iapws para obtener las mismas salidas, que sean comparables con los resultados obtenidos en el código anterior. 
 
 # Empezamos con esto, y vemos, si terminamos mucho antes, agregamos alguna otra cosa para hacer extra
