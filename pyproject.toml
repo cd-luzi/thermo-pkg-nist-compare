@@ -2,7 +2,7 @@
 name = "cursopythonib_proy_termo"
 version = "0.1.0"
 description = "Proyecto de termodinámica para el curso de Python I.B."
-requires-python = ">=3.15"
+requires-python = ">=3.14"
 dependencies = [
     "coolprop>=8.0.0",
     "iapws>=1.5.5",
