@@ -28,7 +28,8 @@ El proyecto busca comparar datos termodinámicos del agua como vapor sobrecalent
 ## Organización
 
 Carlos:
-Lectura de datos: leer de internet y bajarlos a un directorio o leerlos del directorio (en caso de que ya estén bajados los datos) 
+Lectura de datos: leer de internet y bajarlos a un directorio o leerlos del directorio (en caso de que ya estén bajados los datos)
+Agregar un "módulo" que donde se defina los valores y condiciones de búsqueda para los casos base y que se lean a través de las diferentes funciones.
 -------------------------------------------------------------------------------
 
 Jazmin:
