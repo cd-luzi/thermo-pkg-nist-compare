@@ -30,6 +30,7 @@ El proyecto busca comparar datos termodinámicos del agua como vapor sobrecalent
 Lectura de datos: leer de internet y bajarlos a un directorio o leerlos del directorio (en caso de que ya estén bajados los datos)
 
 Interpolación de los datos: 
+    -Se puede usar : np.interp (numpy), scipy.interpolate o DataFrame.interpolate (pandas)
     -obtener curvas para graficar, ej h vs P en curvas isotérmicas
     -tablas con algunas propiedades. Se debe poder elegir el rango, la cantidad de datos fija, como opción refinar el paso. 
 
