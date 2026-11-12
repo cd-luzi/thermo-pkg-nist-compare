@@ -35,3 +35,4 @@ Interpolación de los datos:
 
 Salidas finales: gráficos y las tablas. Decidir como guardarlas.
 
+# Empezamos con esto, y vemos, si terminamos mucho antes, agregamos alguna otra cosa para hacer extra
