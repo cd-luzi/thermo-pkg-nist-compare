@@ -26,4 +26,12 @@ El proyecto busca comparar datos termodinámicos del agua como vapor sobrecalent
 * thermochem
 
 ## Organización
-Deberíamos dividir las tareas de acuerdo con los Aspectos a cubrir. Modifiquen y propongan a gusto.
+
+Lectura de datos: leer de internet y bajarlos a un directorio o leerlos del directorio (en caso de que ya estén bajados los datos)
+
+Interpolación de los datos: 
+    -obtener curvas para graficar, ej h vs P en curvas isotérmicas
+    -tablas con algunas propiedades. Se debe poder elegir el rango, la cantidad de datos fija, como opción refinar el paso. 
+
+Salidas finales: gráficos y las tablas. Decidir como guardarlas.
+
