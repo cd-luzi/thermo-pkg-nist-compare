@@ -1,8 +1,6 @@
 '''
 Interpolación de los datos: 
-    -Se puede usar : make_interp_spline(x, y, k=3, t=None, bc_type=None, axis=0, check_finite=True)[source]
     -obtener curvas para graficar, ej h vs P en curvas isotérmicas
-    -tablas con algunas propiedades. Se debe poder elegir el rango, la cantidad de datos fija, como opción refinar el paso. 
     -Salidas finales: gráficos y las tablas. Decidir como guardarlas.
 '''
 
@@ -31,11 +29,3 @@ def interpolacion(x, y, comienzo=None, fin=None, espaciado=None): # incluye el v
     return (puntos, interp(puntos)) # aca se evalua la funcion en los puntos de interés y los retorna
 
 
-# parametros para probar, los pueden descomentar y cambiar cosas si quieren
-
-#x = np.array([0, 1, 2, 3, 4])
-#y = np.array([0, 0.8, 0.9, 0.1, -0.8])
-
-#tabla_interpolada = interpolacion(x, y, 0, 4, 1) 
-
-#print(tabla_interpolada)
