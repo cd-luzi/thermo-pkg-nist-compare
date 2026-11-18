@@ -1,9 +1,19 @@
 # Descripción
-El proyecto busca comparar datos termodinámicos del agua como vapor sobrecalentado o en equilibrio líquido-vapor obtenidos de la página del NIST, frente a los datos calculados con el paquete "thermochem". Corresponde al proyecto final del curso [Python Científico](https://wpregliasco.github.io/python-sci/), del Instituto Balseiro.
+El proyecto busca comparar datos termodinámicos, en principio limitados al agua como vapor sobrecalentado o en equilibrio líquido-vapor, obtenidos de la página del NIST, frente a los datos calculados con diferentes paquetes termodinámicos de Python, como "thermochem" entre otros. Corresponde al proyecto final del curso [Python Científico](https://wpregliasco.github.io/python-sci/), del Instituto Balseiro.
 
+[_Nota: este readme aún se debe completar para adecuarlo a la estructura sugerida al terminar_]
 <br>
 
 # _De uso interno, para eliminar al terminar_
+
+<div style="background-color: #f0eca2; padding: 5px; color: #000000"; markdown="1">
+<b>NOTA</b>: <i>Cambié el nombre del repositorio y del paquete. Los cambios en la estructura se debería cargar cuando hagan "pull". no obstante, deberían actualizar la url del proyecto, ejecutando:</i>
+
+```bash
+git remote set-url origin https://github.com/cd-luzi/thermo-pkg-nist-compare.git
+```
+
+</div>
 
 
 ## Aspectos que tendríamos que cubrir
