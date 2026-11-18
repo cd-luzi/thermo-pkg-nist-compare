@@ -1,5 +1,13 @@
 temp.md
 
+# Ignore temporary files
+src/thermo_pkg_nist_compare/Example_coolprop.py
+src/thermo_pkg_nist_compare/Example_IAPWS97.py
+src/thermo_pkg_nist_compare/Example_thermochem_burcat.py
+src/thermo_pkg_nist_compare/Example_thermochem_iapws.py
+src/thermo_pkg_nist_compare/Example_thermochem_janaf.py
+src/thermo_pkg_nist_compare/sustancias_burcat.txt
+
 # Python
 __pycache__/
 *.py[cod]
