@@ -4,7 +4,16 @@ from interpolacion import interpolacion
 from pathlib import Path
 
 def graficar(x, y, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, color='m', linewidth=1, markersize=40):
+    """
+    Grafica los datos (x, y) como puntos, junto con su curva interpolada.
 
+    La curva sale de un spline cuadrático evaluado cada 0.05 entre x[0] y x[-1].
+    Si se pasan nombres y unidades de las variables, guarda el gráfico como PNG
+    en la carpeta "Graficos". Si falta alguno, lo muestra con ejes genéricos y no lo guarda.
+
+    Se puede elegir color, linewidth y markersize para controlar el color, el grosor de la curva
+    y el tamaño de los puntos.
+    """
     curva_x, curva_y = interpolacion(x, y, espaciado=0.05)
 
     plt.plot(curva_x, curva_y, linewidth=linewidth, color=color)
