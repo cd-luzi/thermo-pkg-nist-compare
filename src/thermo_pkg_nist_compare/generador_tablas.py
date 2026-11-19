@@ -50,7 +50,7 @@ def tabular(x, y, comienzo=None, fin=None, espaciado=None, decimales=3, nombre_x
             
     tabla = (
         GT(df)
-        .tab_header(title=f"{nombre_y.capitalize()} y {nombre_x.lower()} para valores entre {x[0]} y {x[-1]}")
+        .tab_header(title=f"{nombre_x.capitalize()} y {nombre_y.lower()} para valores entre {valores_x[0]} y {valores_x[-1]}")
         .fmt_number(columns=[variable_x, variable_y], decimals = decimales)
         )
 
