@@ -6,7 +6,16 @@ from great_tables import GT
 
 #pip install great_tables
 def tabular(x, y, comienzo=None, fin=None, espaciado=None, decimales=3, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None):
+    """
+    Genera una tabla con valores interpolados de (x, y) y la guarda como imagen.
 
+    Interpola con un spline cuadrático desde `comienzo` cada `espaciado`, sin pasarse de `fin`, incluyéndolo.
+    Por defecto: comienzo=x[0], fin=x[-1], espaciado=(fin-comienzo)/20.
+    `decimales` fija cuántos decimales se muestran en la tabla.
+
+    Si se pasan nombres y unidades de las variables, guarda la tabla como PNG
+    en la carpeta "Tablas". Si falta alguno, no la genera.
+    """
     if not(espaciado):
         espaciado = abs((x[0]-x[-1])/20)
 
