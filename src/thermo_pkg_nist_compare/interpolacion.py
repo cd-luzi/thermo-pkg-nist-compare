@@ -2,6 +2,15 @@ from scipy.interpolate import make_interp_spline
 import numpy as np
 
 def interpolacion(x, y, comienzo=None, fin=None, espaciado=None): # incluye el valor en el fin
+    """
+    Interpola (x, y) con un spline cuadrático y lo evalúa en puntos equiespaciados.
+
+    Evalúa desde `comienzo` cada `espaciado`, sin pasarse de `fin`, pero incluyéndolo.
+    Por defecto: comienzo=x[0], fin=x[-1], espaciado=(fin-comienzo)/5.
+    Fuera del rango de `x` extrapola, así que esos valores pueden no ser confiables.
+
+    Devuelve (puntos, valores) como arrays de numpy.
+    """
         
     if comienzo==None:
         comienzo = x[0]
