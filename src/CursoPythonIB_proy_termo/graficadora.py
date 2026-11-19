@@ -28,7 +28,9 @@ def graficar(x, y, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, c
             carpeta.mkdir(parents=True, exist_ok=True)
             nombre_archivo = f"{nombre_y.lower()}_vs_{nombre_x.lower()}_rango_{x[0]}_{x[-1]}.png"
             plt.savefig(carpeta / nombre_archivo)
+            
         else:
+
             unidad_x = "u.a."
             unidad_y = "u.a."
             print("Agregar unidades. No se guardó el grafico.")
