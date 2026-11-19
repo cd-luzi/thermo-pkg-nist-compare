@@ -1,7 +1,7 @@
 [project]
-name = "cursopythonib_proy_termo"
+name = "thermo_pkg_nist_compare"
 version = "0.1.0"
-description = "Proyecto de termodinámica para el curso de Python I.B."
+description = "Comparación básica de paquetes termodinámicos contra datos recabados de NIST."
 requires-python = ">=3.14"
 dependencies = [
     "coolprop>=8.0.0",
@@ -20,4 +20,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/curso_python_ib_proy_termo"]
+packages = ["src/thermo_pkg_nist_compare"]
