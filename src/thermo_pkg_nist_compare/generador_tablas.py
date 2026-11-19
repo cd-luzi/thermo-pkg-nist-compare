@@ -14,7 +14,7 @@ def tabular(x, y, comienzo=None, fin=None, espaciado=None, decimales=3, nombre_x
     `decimales` fija cuántos decimales se muestran en la tabla.
 
     Si se pasan nombres y unidades de las variables, guarda la tabla como PNG
-    en la carpeta "Tablas". Si falta alguno, no la genera.
+    en la carpeta "Tablas". Si falta alguno, no la gguarda, solo la genera.
     """
     if not(espaciado):
         espaciado = abs((x[0]-x[-1])/20)
@@ -46,14 +46,17 @@ def tabular(x, y, comienzo=None, fin=None, espaciado=None, decimales=3, nombre_x
     df = pd.DataFrame({
         variable_x: valores_x,
         variable_y: valores_y,
-    })
+        })
+            
+    tabla = (
+        GT(df)
+        .tab_header(title=f"{nombre_y.capitalize()} y {nombre_x.lower()} para valores entre {x[0]} y {x[-1]}")
+        .fmt_number(columns=[variable_x, variable_y], decimals = decimales)
+        )
 
-    if guardar:
-        tabla = (
-                GT(df)
-                .tab_header(title=f"{nombre_y.capitalize()} y {nombre_x.lower()} para valores entre {x[0]} y {x[-1]}")
-                .fmt_number(columns=[variable_x, variable_y], decimals = decimales)
-            )
+    tabla.show()
+
+    if guardar:   
         carpeta = Path("Tablas")
         carpeta.mkdir(parents=True, exist_ok=True)
         nombre_archivo = f"{nombre_y.lower()}_{nombre_x.lower()}_rango_{valores_x[0]}_{valores_x[-1]}.png"
