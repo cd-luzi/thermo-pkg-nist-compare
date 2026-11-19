@@ -1,8 +1,8 @@
 import re
-from io import StringIO
 
-import pandas as pd
 import requests
+
+from thermo_pkg_nist_compare.propdata import PropData
 
 # =============================================================================
 # Parámetros "constantes" que se emplean en el módulo. Como son de uso interno,
@@ -47,93 +47,6 @@ _ALIAS_BASE = {
     "ph": "Phase",
 }
 
-
-class NISTData(pd.DataFrame):
-    """
-    Clase básica que hereda todo de DataFrame de pandas, pero que
-    modifica el método __getitem__ para que devuelva directamente
-    un array de numpy cuando se pide por nombre.
-    Además, desde los alias de base (_ALIAS_BASE), asigna alias a
-    las distintas variables, para identificarlas más fácil (ver
-    "_generate_aliases"). Los alias de base usados son:
-        * "T": "Temperature"
-        * "P": "Pressure"
-        * "rho": "Density"
-        * "v": "Volume"
-        * "u": "Internal Energy"
-        * "h": "Enthalpy"
-        * "s": "Entropy"
-        * "Cv": "Cv"
-        * "Cp": "Cp"
-        * "w": "Sound Spd."
-        * "JT": "Joule-Thomson"
-        * "mu": "Viscosity"
-        * "k": "Therm. Cond."
-        * "ph": "Phase"
-
-        Y "_generate_aliases" los usa para crear la lista de alias definitivos
-        para que coincidan con los nombres extraídos del NIST que agregan
-        información sobre las unidades.
-        Se puede acceder a la lista de alias completa con:
-        self.alias
-    """
-
-    # Atributos personalizados que pandas conserva al crear copias o subconjuntos.
-    # La tupla —("alias",)— evita usar una lista mutable —["alias"]— como atributo
-    # de clase.
-    _metadata = ("alias",)
-
-    def __init__(self, data):
-
-        super().__init__(data)
-
-        self._generate_aliases(
-            self.columns,
-        )
-
-    @property
-    def _constructor(self):
-        """
-        Con esto nos garantizamos que las operaciones que devolverían un
-        DataFrame de pandas nos sigan devolviendo la clase así definida. De
-        esta manera, si data_table es una tabla creada con NISTData, la
-        operación data_table[["T", "P"]] devolverá una clase NISTData en
-        lugar de un DataFrame puro.
-        """
-        return NISTData
-
-    def _generate_aliases(self, encabezados):
-
-        aliases = {}
-
-        for alias, name in _ALIAS_BASE.items():
-            matches = [
-                encabezado
-                for encabezado in encabezados
-                if name.casefold() == encabezado.split("(")[0].strip().casefold()
-            ]
-
-            if len(matches) == 1:
-                aliases[alias] = matches[0]
-
-        self.alias = aliases
-
-    def __getitem__(self, keys):
-
-        if isinstance(keys, list):
-            keys = [self.alias.get(k, k) if isinstance(k, str) else k for k in keys]
-
-        if isinstance(keys, str):
-            keys = self.alias.get(keys, keys)
-
-        result = super().__getitem__(keys)
-
-        if isinstance(result, pd.Series):
-            return result.to_numpy()
-
-        return result
-
-
 def main() -> None:
     """
     Todo lo que está acá sirve de ejemplo cuando se ejecuta el script con:
@@ -176,8 +89,6 @@ def main() -> None:
     print(table_red["h"])
     print(data_table.alias)
 
-    return data_table
-
 
 # Función principal de búsqueda
 def busqueda_web_nist(
@@ -206,7 +117,7 @@ def busqueda_web_nist(
 
     Returns
     -------
-    NISTData
+    Objeto PropData
         Tabla de resultados. Permite acceder a propiedades usando sus
         nombres completos o alias, por ejemplo, "Temperature (K)" o "T".
 
@@ -245,16 +156,9 @@ def busqueda_web_nist(
 
     encabezados = texto[0]
     encabezados = re.split(r"(?<=\))\s+", encabezados)
+    datos = "\n".join(texto[1:])
 
-    return NISTData(
-        pd.read_csv(
-            StringIO("\n".join(texto[1:])),
-            sep=r"\s+",
-            names=encabezados,
-            dtype={"Phase": str},
-            engine="python",
-        )
-    )
+    return PropData(datos, encabezados, _ALIAS_BASE)
 
 
 # Validación de datos y creación de links para buscar
