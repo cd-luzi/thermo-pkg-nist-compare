@@ -3,6 +3,7 @@ import re
 import requests
 
 from thermo_pkg_nist_compare.propdata import PropData
+from thermo_pkg_nist_compare.substancelist import Substance
 
 # =============================================================================
 # Parámetros "constantes" que se emplean en el módulo. Como son de uso interno,
@@ -11,12 +12,16 @@ from thermo_pkg_nist_compare.propdata import PropData
 # El último está vinculado a la clase definida para las tablas.
 # =============================================================================
 
+# BUSCAR retry
+# Agregar búsqueda isocórica (Type=IsoChor)
+# Agregar caso de saturación: (Type=SatP o Type=SatT)
+
+
 URL_BASE = "https://webbook.nist.gov/cgi/fluid.cgi"
 
 PARAMETROS_FIJOS: dict[str, str] = {
     "Action": "Data",
     "Wide": "on",
-    "ID": "C7732185",
     "RefState": "DEF",
 }
 
@@ -46,6 +51,40 @@ _ALIAS_BASE = {
     "k": "Therm. Cond.",
     "ph": "Phase",
 }
+
+TIPOS_BUSQ = {
+    "T cte": "IsoTherm",
+    "T cte.": "IsoTherm",
+    "IsoTherm": "IsoTherm",
+    "Isotermico": "IsoTherm",
+    "Isotérmico": "IsoTherm",
+
+    "P cte": "IsoBar",
+    "P cte.": "IsoBar",
+    "IsoBar": "IsoBar",
+    "Isobarico": "IsoBar",
+    "Isobárico": "IsoBar",
+
+    "V cte": "IsoChor",
+    "V cte.": "IsoChor",
+    "IsoChor": "IsoChor",
+    "Isocorico": "IsoChor",
+    "Isocórico": "IsoChor",
+
+    "SatP": "SatP",
+    "Saturacion P cte": "SatP",
+    "Saturacion P cte.": "SatP",
+    "Saturación P cte": "SatP",
+    "Saturación P cte.": "SatP",
+
+    "SatT": "SatT",
+    "Saturacion T cte": "SatT",
+    "Saturacion T cte.": "SatT",
+    "Saturación T cte": "SatT",
+    "Saturación T cte.": "SatT",
+}
+
+SUSTANCIA_POR_DEFECTO = Substance.from_alias("agua")
 
 def main() -> None:
     """
@@ -98,12 +137,14 @@ def busqueda_web_nist(
     rg_max: float,
     rg_interval: float,
     decimales: int = 12,
-):
+    sustancia: Substance = SUSTANCIA_POR_DEFECTO,
+    unidades: dict[str, str] | None = None,
+) -> PropData:
     """Descarga datos termodinámicos del agua desde el WebBook del NIST.
 
     Parameters
     ----------
-    iso_var : str
+    iso_var : str ACTUALIZAR!!!
         Tipo de búsqueda: "IsoBar" (presión fija) o "IsoTherm"
         (temperatura fija).
     iso_value : float
@@ -143,6 +184,7 @@ def busqueda_web_nist(
         rg_max,
         rg_interval,
         decimales,
+        sustancia,
     )
 
     try:
@@ -170,7 +212,10 @@ def validar_entradas_y_crear_parametros(
     rg_max: float,
     rg_interval: float,
     digitos: int,
+    sustancia: Substance,
 ) -> dict:
+
+    # ACTUALIZAR ISOVAR!
 
     match iso_var:
         case "IsoBar":
@@ -183,6 +228,7 @@ def validar_entradas_y_crear_parametros(
                 "TLow": rg_min,
                 "THigh": rg_max,
                 "TInc": rg_interval,
+                "ID": sustancia.nist_id
             }
         case "IsoTherm":
             # Luego validaremos el resto
@@ -194,6 +240,7 @@ def validar_entradas_y_crear_parametros(
                 "PLow": rg_min,
                 "PHigh": rg_max,
                 "PInc": rg_interval,
+                "ID": sustancia.nist_id
             }
 
         case _:
