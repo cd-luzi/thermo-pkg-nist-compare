@@ -1,7 +1,47 @@
-from enum import Enum
+from enum import Enum, EnumMeta
 
 
-class Substance(Enum):
+class SubstanceEnumMeta(EnumMeta):
+    """
+    MetaClase usada para imprimir información a nivel clase y no objeto. Se usa
+    para que el usuario pueda consultar el listado de sustancias disponibles y
+    se imprima de forma ordenada y prolija, omitiendo información que no sería
+    de su interés (el ID).
+    """
+
+    def __str__(cls):
+        headers = ("Nombre (Esp.)", "Nombre (Eng.)", "Fórmula")
+
+        rows = [
+            (nombre_es, nombre_en, formula)
+            for formula, nombre_es, nombre_en in (member.value for member in cls)
+        ]
+
+        widths = [
+            max(len(header), *(len(row[i]) for row in rows))
+            for i, header in enumerate(headers)
+        ]
+
+        header = " | ".join(f"{name:<{width}}" for name, width in zip(headers, widths))
+
+        separator = "-+-".join("-" * width for width in widths)
+
+        body = [
+            " | ".join(f"{value:<{width}}" for value, width in zip(row, widths))
+            for row in rows
+        ]
+
+        return (
+            "Las sustancias disponibles son:\n\n"
+            + header
+            + "\n"
+            + separator
+            + "\n"
+            + "\n".join(body)
+        )
+
+
+class Substance(Enum, metaclass=SubstanceEnumMeta):
     """
     Clase basada enb "Enum". Contiene el listado de las sustancias disponibles
     en el webbook del NIST (abierto) con la fórmula, el nombre en inglés y en
@@ -19,6 +59,8 @@ class Substance(Enum):
     se debe llamar primero a esta clase (por ejemplo, `sust = Substance("H2")`)
     y luego pasar sust como valor del argumento `sustancia` en `busqeuda_web_nist`.
     Internamente, esa función leerá el ID para el NIST desde sust.nist_id.
+    Para ver el listado de sustancias disponibles, ejecutar:
+    `print(Substance)`
     """
 
     # ID = (formula, nombre_español, nombre_ingles)
@@ -76,42 +118,54 @@ class Substance(Enum):
     C75105 = ("CH2F2", "Difluorometano", "Difluoromethane")
     C593533 = ("CH3F", "Fluorometano", "Fluoromethane")
 
-    C76131 = ("C2Cl3F3", "1,1,2-Tricloro-1,2,2-trifluoroetano",
-              "1,1,2-Trichloro-1,2,2-trifluoroethane")
-    C76142 = ("C2Cl2F4", "1,2-Dicloro-1,1,2,2-tetrafluoroetano",
-              "1,2-Dichloro-1,1,2,2-tetrafluoroethane")
-    C76153 = ("C2ClF5", "Cloropentafluoroetano",
-              "Chloropentafluoroethane")
+    C76131 = (
+        "C2Cl3F3",
+        "1,1,2-Tricloro-1,2,2-trifluoroetano",
+        "1,1,2-Trichloro-1,2,2-trifluoroethane",
+    )
+    C76142 = (
+        "C2Cl2F4",
+        "1,2-Dicloro-1,1,2,2-tetrafluoroetano",
+        "1,2-Dichloro-1,1,2,2-tetrafluoroethane",
+    )
+    C76153 = ("C2ClF5", "Cloropentafluoroetano", "Chloropentafluoroethane")
     C76164 = ("C2F6", "Hexafluoroetano", "Hexafluoroethane")
-    C306832 = ("C2HCl2F3", "2,2-Dicloro-1,1,1-trifluoroetano",
-               "2,2-Dichloro-1,1,1-trifluoroethane")
-    C2837890 = ("C2HClF4", "1-Cloro-1,2,2,2-tetrafluoroetano",
-                "1-Chloro-1,2,2,2-tetrafluoroethane")
+    C306832 = (
+        "C2HCl2F3",
+        "2,2-Dicloro-1,1,1-trifluoroetano",
+        "2,2-Dichloro-1,1,1-trifluoroethane",
+    )
+    C2837890 = (
+        "C2HClF4",
+        "1-Cloro-1,2,2,2-tetrafluoroetano",
+        "1-Chloro-1,2,2,2-tetrafluoroethane",
+    )
     C354336 = ("C2HF5", "Pentafluoroetano", "Pentafluoroethane")
-    C811972 = ("C2H2F4", "1,1,1,2-Tetrafluoroetano",
-               "1,1,1,2-Tetrafluoroethane")
-    C1717006 = ("C2H3Cl2F", "1,1-Dicloro-1-fluoroetano",
-                "1,1-Dichloro-1-fluoroethane")
-    C75683 = ("C2H3ClF2", "1-Cloro-1,1-difluoroetano",
-              "1-Chloro-1,1-difluoroethane")
-    C420462 = ("C2H3F3", "1,1,1-Trifluoroetano",
-               "1,1,1-Trifluoroethane")
-    C75376 = ("C2H4F2", "1,1-Difluoroetano",
-              "1,1-Difluoroethane")
+    C811972 = ("C2H2F4", "1,1,1,2-Tetrafluoroetano", "1,1,1,2-Tetrafluoroethane")
+    C1717006 = ("C2H3Cl2F", "1,1-Dicloro-1-fluoroetano", "1,1-Dichloro-1-fluoroethane")
+    C75683 = ("C2H3ClF2", "1-Cloro-1,1-difluoroetano", "1-Chloro-1,1-difluoroethane")
+    C420462 = ("C2H3F3", "1,1,1-Trifluoroetano", "1,1,1-Trifluoroethane")
+    C75376 = ("C2H4F2", "1,1-Difluoroetano", "1,1-Difluoroethane")
 
     C76197 = ("C3F8", "Octafluoropropano", "Octafluoropropane")
-    C431890 = ("C3H1F7", "1,1,1,2,3,3,3-Heptafluoropropano",
-               "1,1,1,2,3,3,3-Heptafluoropropane")
-    C431630 = ("C3H2F6", "1,1,1,2,3,3-Hexafluoropropano",
-               "1,1,1,2,3,3-Hexafluoropropane")
-    C690391 = ("C3H2F6", "1,1,1,3,3,3-Hexafluoropropano",
-               "1,1,1,3,3,3-Hexafluoropropane")
-    C679867 = ("C3H3F5", "1,1,2,2,3-Pentafluoropropano",
-               "1,1,2,2,3-Pentafluoropropane")
-    C460731 = ("C3H3F5", "1,1,1,3,3-Pentafluoropropano",
-               "1,1,1,3,3-Pentafluoropropane")
-    C115253 = ("C4F8", "Octafluorociclobutano",
-               "Octafluorocyclobutane")
+    C431890 = (
+        "C3H1F7",
+        "1,1,1,2,3,3,3-Heptafluoropropano",
+        "1,1,1,2,3,3,3-Heptafluoropropane",
+    )
+    C431630 = (
+        "C3H2F6",
+        "1,1,1,2,3,3-Hexafluoropropano",
+        "1,1,1,2,3,3-Hexafluoropropane",
+    )
+    C690391 = (
+        "C3H2F6",
+        "1,1,1,3,3,3-Hexafluoropropano",
+        "1,1,1,3,3,3-Hexafluoropropane",
+    )
+    C679867 = ("C3H3F5", "1,1,2,2,3-Pentafluoropropano", "1,1,2,2,3-Pentafluoropropane")
+    C460731 = ("C3H3F5", "1,1,1,3,3-Pentafluoropropano", "1,1,1,3,3-Pentafluoropropane")
+    C115253 = ("C4F8", "Octafluorociclobutano", "Octafluorocyclobutane")
 
     C71432 = ("C6H6", "Benceno", "Benzene")
     C108883 = ("C7H8", "Tolueno", "Toluene")
@@ -149,15 +203,28 @@ class Substance(Enum):
                 for substance in cls
                 if alias in (s.casefold() for s in substance.value)
             ),
-            None
+            None,
+        )
+
+    def __str__(self):
+        formula, nombre_es, nombre_en = self.value
+
+        return (
+            f"La sustancia elegida es '{nombre_es}'.\n"
+            "Alias adicionales:\n"
+            f" * '{nombre_en}'\n"
+            f" * '{formula}'\n"
+            "NIST ID:\n"
+            f" * '{self.name}'"
         )
 
 
 def main() -> None:
     print(
-        "Clase basada en Enum que contiene el listado de sustancias\n" \
+        "Clase basada en Enum que contiene el listado de sustancias\n"
         "disponibles en forma abierta en el NIST."
-        )
+    )
+
 
 if __name__ == "__main__":
     main()

@@ -1,10 +1,8 @@
 import math
-
 import re
+import warnings
 
 import requests
-
-import warnings
 
 from thermo_pkg_nist_compare.propdata import PropData
 from thermo_pkg_nist_compare.substancelist import Substance
@@ -29,7 +27,7 @@ PARAMETROS_FIJOS: dict[str, str] = {
     "RefState": "DEF",
 }
 
-PARAMETROS_UNIDADES = {
+UNIDADES_POR_DEFECTO = {
     "TUnit": "K",
     "PUnit": "MPa",
     "DUnit": "kg/m3",
@@ -39,27 +37,44 @@ PARAMETROS_UNIDADES = {
     "STUnit": "N/m",
 }
 
+UNIDADES_VALIDAS = {
+    "TUnit": ("K", "ºC", "ºF", "R"),
+    "PUnit": ("MPa", "bar", "atm", "torr", "psia"),
+    "DUnit": ("kg/m3", "mol/l", "mol/m3", "g/l", "lb-mole/ft3", "lbm/ft3"),
+    "HUnit": ("kJ/mol", "kJ/kg", "kcal/mol", "Btu/lb-mol", "kcal/g", "Btu/lbm"),
+    "WUnit": ("m/s", "ft/s", "mph"),
+    "VisUnit": ("uPa*s", "Pa*s", "cP", "lbm/ft*s"),
+    "STUnit": ("N/m", "dyn/cm", "lb/ft", "lb/in"),
+}
+
 ALIAS_BASE = {
-    "T": "Temperature",
-    "P": "Pressure",
-    "rho": "Density",
-    "v": "Volume",
-    "u": "Internal Energy",
-    "h": "Enthalpy",
-    "s": "Entropy",
-    "Cv": "Cv",
-    "Cp": "Cp",
-    "w": "Sound Spd.",
-    "JT": "Joule-Thomson",
-    "mu": "Viscosity",
-    "k": "Therm. Cond.",
-    "ph": "Phase",
+    "T": ("Temperature", "Temperatura", "Temp"),
+    "P": ("Pressure", "Presión", "Presion", "Pres"),
+    "rho": ("Density", "Densidad"),
+    "v": ("Volume", "Volumen", "Vol"),
+    "u": ("Internal Energy", "Energía interna", "Energia interna"),
+    "h": ("Enthalpy", "Entalpía", "Entalpia"),
+    "s": ("Entropy", "Entropía", "Entropia"),
+    "Cv": ("Cv",),
+    "Cp": ("Cp",),
+    "w": ("Sound Spd.", "Velocidad del sonido"),
+    "JT": ("Joule-Thomson",),
+    "mu": ("Viscosity", "Viscosidad"),
+    "k": (
+        "Therm. Cond.",
+        "Conductividad térmica",
+        "Conductividad termica",
+        "Cond. térmica",
+        "Cond. termica",
+    ),
+    "sig": ("Surf. Tension", "Tensión superficial", "Tension superficial"),
+    "ph": ("Phase", "Fase"),
 }
 
 # Diccionario para definir el tipo de búsqueda, incorporando diferentes variantes
 # que podría escribir el usuario. Como la búsqueda se hará sin tener en cuenta
 # las mayúsculas usamos en cada clave `.casefold()`.
-TIPOS_BUSQ = {
+TIPOS_BUSQ_VALIDAS = {
     "T cte".casefold(): "IsoTherm",
     "T cte.".casefold(): "IsoTherm",
     "IsoTherm".casefold(): "IsoTherm",
@@ -100,7 +115,7 @@ def main() -> None:
     """
 
     data_table = busqueda_web_nist(
-        iso_var="IsoBar",
+        tipo_busq="IsoBar",
         iso_value=0.1,
         rg_min=373,
         rg_max=573,
@@ -111,7 +126,7 @@ def main() -> None:
     print(data_table.to_string(index=False))
     print("\nProbando el retorno de una columna por nombre:")
     print("filas 2-5 de temperatura: ")
-    for val in data_table["Temperature (K)"][2:6]:
+    for val in data_table["Temperature"][2:6]:
         print(f" * T = {val}")
 
     print("\nImpresión de un extracto de la tabla con un subconjunto de propiedades:")
@@ -120,11 +135,11 @@ def main() -> None:
     """
     table_red = data_table[
         [
-            "Temperature (K)",
-            "Pressure (MPa)",
-            "Internal Energy (kJ/mol)",
-            "Enthalpy (kJ/mol)",
-            "Entropy (J/mol*K)",
+            "Temperature",
+            "Pressure",
+            "Internal Energy",
+            "Enthalpy",
+            "Entropy",
         ]
     ]
     """
@@ -135,7 +150,7 @@ def main() -> None:
 
 # Función principal de búsqueda
 def busqueda_web_nist(
-    iso_var: str,
+    tipo_busq: str,
     rg_min: float,
     rg_max: float,
     rg_interval: float,
@@ -148,24 +163,24 @@ def busqueda_web_nist(
 
     Parameters
     ----------
-    iso_var: str
+    tipo_busq: str
         Define el tipo de búsqueda. Formalmente puede ser:
           * "IsoBar"   (presión fija)
           * "IsoTherm" (temperatura fija)
-          * "IsoChor"  (volumen fijo)
+          * "IsoChor"  (volumen fijo; se usa la densidad)
           * "SatP"     (Eq. líquido-vapor, presión a determinar —el rango dado
                         corresponde a la temperatura—)
           * "SatT"     (Eq. líquido-vapor, temperatura a determinar —el rango
                         dado corresponde a la presión—)
         Internamente se trabaja con alias para detectar otras formas esperables
         (por ejemplo, "T cte" e "Isotermico",  equivale a "IsoTherm"). Ver
-        `datos_nist_web.TIPOS_BUSQ`.
+        `datos_nist_web.TIPOS_BUSQ_VALIDAS`.
 
     iso_value : float o None
         Presión fija en las unidades seleccionadas (MPa por defecto), si
-        iso_var="IsoBar". Temperatura fija en las unidades seleccionadas (K por
-        defecto), si iso_var="IsoTherm". Volumen  fijo en las unidades
-        seleccionadas (m^3/kg por defecto), si iso_var="IsoChor". None o
+        tipo_busq="IsoBar". Temperatura fija en las unidades seleccionadas (K por
+        defecto), si tipo_busq="IsoTherm". Densidad fija en las unidades
+        seleccionadas (kg/m^3 por defecto), si tipo_busq="IsoChor". None o
         cualquier valor en caso contrario (no se utiliza).
 
     rg_min, rg_max, rg_interval: float
@@ -197,7 +212,10 @@ def busqueda_web_nist(
          * "VisUnit": unidades para la viscosidad
          * "STUnit":  unidades para la tensión superficial (solo en fase líquida
                       para los datos de equilibrio de fases)
-        Cualquier otro par clave-valor se ignora.
+        Cualquier otro par clave-valor se ignora. Las unidades dadas deben ser
+        válidas y respetar mayúsculas y minúsculas en este caso, para evitar
+        ambigüedades. Para consultar el listado de unidades posibles y la forma
+        en que deben ingresarse, vea:   `datos_nist_web.UNIDADES_VALIDAS`.
 
     Returns
     -------
@@ -217,49 +235,140 @@ def busqueda_web_nist(
     """
 
     parametros = validar_entradas_y_crear_parametros(
-        iso_var,
+        tipo_busq,
         iso_value,
         rg_min,
         rg_max,
         rg_interval,
         decimales,
         sustancia,
+        unidades,
     )
 
     try:
         consulta = requests.get(URL_BASE, params=parametros)
         consulta.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        print(consulta.url)
+        print("La consulta web a", consulta.url, "falló con:")
         print("HTTP error:", e)
+        print("No se pudo obtener la tabla de propiedades")
+
+        return None
+
+    return obtencion_datos(consulta, tipo_busq)
+
+
+def obtencion_datos(consulta, tipo_busq):
+
+    # Primero invertimos el diccionario de alias localmente:
+    alias_inv = {
+        nombre: key for key, nombres in ALIAS_BASE.items() for nombre in nombres
+    }
 
     texto = consulta.text.splitlines()
-
     encabezados = texto[0]
-    encabezados = re.split(r"(?<=\))\s+", encabezados)
-    datos = "\n".join(texto[1:])
 
-    return PropData(datos, encabezados, ALIAS_BASE)
+    # 1. Separación de encabezados (general)
+    encabezados = re.split(r"(?<=\))\s+", encabezados)
+    # r"(?<=\))\s+" busca uno o más espacios en blanco,\s+, siempre que estén
+    # precedidos por un paréntesis de cierre, \), donde la barra invertida es
+    # para indicar un paréntesis literal.
+
+    # 2. Expresión regular para interpretar los encabezados:
+    patron_encabezado = re.compile(r"^(.*?)\s*(?:\((?:([lv]),\s*)?(.*?)\))?$")
+    # La expresión `r"^(.*?)\s*(?:\((?:([lv]),\s*)?(.*?)\))?$"` permite separar
+    # el encabezado en tres partes: el nombre de la variable, su fase y su
+    # unidad. El primer grupo de captura, (.*?), identifica el nombre; el
+    # segundo, ([lv]), identifica la fase ("l" o "v"); y el tercero, (.*?),
+    # identifica la unidad.
+    # Los grupos que comienzan con `?:` son grupos que no capturan información,
+    # sino que permiten agrupar elementos de la expresión. En este caso,
+    # permiten reconocer opcionalmente la fase y el bloque entre paréntesis.
+    # Los paréntesis escapados, \( y \), representan paréntesis literales.
+    # Finalmente, ^ y $ indican el inicio y el final del encabezado,
+    # respectivamente. Los signos `?` indican que los elementos precedentes son
+    # opcionales. Si un grupo de captura opcional no aparece en el encabezado,
+    # su valor será `None` al recuperar los grupos mediante `.groups()`.
+
+    if tipo_busq not in ["SatT", "SatP"]:
+        # Una sola fase: reconstrucción directa de datos y encabezados.
+        encabezados_mod = []
+        for encabezado in encabezados:
+            nombre = patron_encabezado.match(encabezado).group(1)
+            encabezados_mod.append(alias_inv.get(nombre, "¿" + nombre + "?"))
+
+        # 2. Reconstrucción de datos como texto.
+        datos = "\n".join(texto[1:])
+        return PropData(datos, encabezados_mod, ALIAS_BASE)
+
+    # Si llegó hasta acá es porque fue una búsqueda en condiciones de
+    # saturación. Tenemos que separar los datos leídos y devolver dos tablas.
+
+    # 3. Clasificación e interpretación de columnas
+    columnas = {"comunes": [], "l": [], "v": []}
+    variables = []
+    unidades = []
+
+    for i, encabezado in enumerate(encabezados):
+        nombre, fase, unidad = patron_encabezado.match(encabezado).groups()
+
+        variable = alias_inv.get(nombre, "¿" + nombre + "?")
+
+        variables.append(variable)
+        unidades.append(unidad)
+
+        grupo = fase if fase else "comunes"
+        columnas[grupo].append(i)
+
+    # 3. Construcción de índices, encabezados y unidades por fase
+    indices_liq = columnas["comunes"] + columnas["l"]
+    indices_vap = columnas["comunes"] + columnas["v"]
+
+    encabezados_liq = [variables[i] for i in indices_liq] + ["ph"]
+    encabezados_vap = [variables[i] for i in indices_vap] + ["ph"]
+
+    unidades_liq = {variables[i]: unidades[i] for i in indices_liq}
+    unidades_vap = {variables[i]: unidades[i] for i in indices_vap}
+
+    unidades_liq["ph"] = None
+    unidades_vap["ph"] = None
+
+    # 4. Extracción de datos
+    datos_liq = "\n".join(
+        " ".join([*(linea.split()[i] for i in indices_liq), "liquid"])
+        for linea in texto[1:]
+    )
+
+    datos_vap = "\n".join(
+        " ".join([*(linea.split()[i] for i in indices_vap), "vapor"])
+        for linea in texto[1:]
+    )
+
+    return (
+        PropData(datos_liq, encabezados_liq, ALIAS_BASE),
+        PropData(datos_vap, encabezados_vap, ALIAS_BASE),
+    )
 
 
 # Validación de datos y creación de links para buscar
 # datos isobáricos o isotérmicos
 def validar_entradas_y_crear_parametros(
-    iso_var: str,
+    tipo_busq: str,
     iso_value: float | None,
     rg_min: float,
     rg_max: float,
     rg_interval: float,
     digitos: int,
     sustancia: Substance,
+    unidades: dict[str, str],
 ) -> dict:
 
-    # Determinación del valor adecuado de iso_var (puede resultar "None", en
+    # Determinación del valor adecuado de tipo_busq (puede resultar "None", en
     # cuyo caso se arroja un error en el bloque `match`).
-    iso_var = get_case_insensitive(TIPOS_BUSQ, iso_var)
+    tipo_busq = get_case_insensitive(tipo_busq)
 
     # Comprobación sobre iso_value si corresponde:
-    validar_numeros(iso_value, "iso_value", iso_var)
+    validar_numeros(iso_value, "iso_value", tipo_busq)
 
     # Comprobación sobre los restantes valores numéricos:
     validar_numeros(rg_min, "rg_min", None)
@@ -269,32 +378,47 @@ def validar_entradas_y_crear_parametros(
     # Validación de la cantidad de dígitos:
     digitos = validar_digitos(digitos)
 
+    # Para las unidades no hacemos una validación estrictamente. Si están mal,
+    # tomamos los valores por defecto.
+    unidades_finales = validar_unidades(unidades)
+
     if not isinstance(sustancia, Substance):
         raise TypeError("`sustancia` debe pertenecer a la clase `Substance`.")
 
-    match iso_var:
-        case "IsoBar":
-            parametros_variables = {
-                "Type": "IsoBar",
-                "Digits": digitos,
-                "P": iso_value,
-                "TLow": rg_min,
-                "THigh": rg_max,
-                "TInc": rg_interval,
-                "ID": sustancia.nist_id,
-            }
-        case "IsoTherm":
-            # Luego validaremos el resto
+    parametros_variables = {
+        "Type": tipo_busq,
+        "Digits": digitos,
+        "ID": sustancia.nist_id,
+    }
 
-            parametros_variables = {
-                "Type": "IsoTherm",
-                "Digits": digitos,
-                "T": iso_value,
-                "PLow": rg_min,
-                "PHigh": rg_max,
-                "PInc": rg_interval,
-                "ID": sustancia.nist_id,
-            }
+    match tipo_busq:
+        case "IsoBar":
+            parametros_variables["P"] = iso_value
+            parametros_variables["TLow"] = rg_min
+            parametros_variables["THigh"] = rg_max
+            parametros_variables["TInc"] = rg_interval
+
+        case "IsoTherm":
+            parametros_variables["T"] = iso_value
+            parametros_variables["PLow"] = rg_min
+            parametros_variables["PHigh"] = rg_max
+            parametros_variables["PInc"] = rg_interval
+
+        case "IsoChor":
+            parametros_variables["D"] = iso_value
+            parametros_variables["TLow"] = rg_min
+            parametros_variables["THigh"] = rg_max
+            parametros_variables["TInc"] = rg_interval
+
+        case "SatP":
+            parametros_variables["TLow"] = rg_min
+            parametros_variables["THigh"] = rg_max
+            parametros_variables["TInc"] = rg_interval
+
+        case "SatT":
+            parametros_variables["PLow"] = rg_min
+            parametros_variables["PHigh"] = rg_max
+            parametros_variables["PInc"] = rg_interval
 
         case _:
             raise ValueError(f"""
@@ -304,10 +428,10 @@ def validar_entradas_y_crear_parametros(
                  * 'IsoChor'\n
                  * 'SatP'\n
                  * 'SatT'\n
-                pero se ingresó el valor: {iso_var}
+                pero se ingresó el valor: {tipo_busq}
                 """)
 
-    return {**PARAMETROS_FIJOS, **PARAMETROS_UNIDADES, **parametros_variables}
+    return {**PARAMETROS_FIJOS, **unidades_finales, **parametros_variables}
 
 
 def validar_numeros(valor, nombre, iso_var):
@@ -356,8 +480,19 @@ def validar_digitos(valor):
     return valor_ent
 
 
+def validar_unidades(unidades):
+    if not isinstance(unidades, dict):
+        return UNIDADES_POR_DEFECTO
+
+    unidades_finales = UNIDADES_POR_DEFECTO.copy()
+    for key, value in unidades.items():
+        if key in unidades_finales and value in UNIDADES_VALIDAS[key]:
+            unidades_finales[key] = value
+
+    return unidades_finales
+
+
 def get_case_insensitive(
-    dictionary: dict[str, str],
     key: str,
 ) -> str | None:
 
@@ -367,7 +502,7 @@ def get_case_insensitive(
     if not isinstance(key, str):
         raise TypeError("Se esperaba un `str` o `None`.")
 
-    return dictionary.get(key.casefold())
+    return TIPOS_BUSQ_VALIDAS.get(key.casefold())
 
 
 if __name__ == "__main__":

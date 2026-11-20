@@ -15,37 +15,23 @@ class _PropDataHelpMeta(type):
         inherited.difference_update(local)
         return sorted(set(type.__dir__(cls)) - inherited)
 
+
 class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
     """
     Clase básica que hereda todo de DataFrame de pandas, pero que
     modifica el método __getitem__ para que devuelva directamente
     un array de numpy cuando se pide por nombre.
-    Además, desde los alias de base (_ALIAS_BASE), asigna alias a
-    las distintas variables, para identificarlas más fácil (ver
-    "_generate_aliases"). Los alias de base usados son:
-        * "T": "Temperature"
-        * "P": "Pressure"
-        * "rho": "Density"
-        * "v": "Volume"
-        * "u": "Internal Energy"
-        * "h": "Enthalpy"
-        * "s": "Entropy"
-        * "Cv": "Cv"
-        * "Cp": "Cp"
-        * "w": "Sound Spd."
-        * "JT": "Joule-Thomson"
-        * "mu": "Viscosity"
-        * "k": "Therm. Cond."
-        * "ph": "Phase"
 
-        Y "_generate_aliases" los usa para crear la lista de alias definitivos
-        para que coincidan con los nombres extraídos del NIST que agregan
-        información sobre las unidades.
-        Se puede acceder a la lista de alias completa con:
+    Además, permite acceder a las columnas mediante nombres alternativos
+    definidos en el diccionario de alias de base (_ALIAS_BASE). Las columnas
+    se almacenan utilizando abreviaturas, mientras que los alias permiten
+    identificarlas mediante nombres alternativos (en inglés o español).
+
+    Se puede acceder al diccionario de alias disponibles mediante:
         self.alias
 
-        Para más información sobre los métodos heredados, consulta
-        la documentación de pandas.DataFrame.
+    Para más información sobre los métodos heredados, consulta
+    la documentación de pandas.DataFrame.
     """
 
     # Atributos personalizados que pandas conserva al crear copias o subconjuntos.
@@ -67,12 +53,12 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
                     if columna in self.columns
                 }
             return
-        
+
         if datos is None:
             super().__init__()
             self.alias = {}
             return
-        
+
         if isinstance(datos, str):
             if datos.startswith(("http://", "https://")):
                 raise NotImplementedError(
@@ -124,17 +110,16 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
 
     def _generate_aliases(self, encabezados, alias_base):
 
+        if alias_base is None:
+            self.alias = {}
+            return
+
         aliases = {}
 
-        for alias, name in alias_base.items():
-            matches = [
-                encabezado
-                for encabezado in encabezados
-                if name.casefold() == encabezado.split("(")[0].strip().casefold()
-            ]
-
-            if len(matches) == 1:
-                aliases[alias] = matches[0]
+        for clave, nombres in alias_base.items():
+            if clave in encabezados:
+                for nombre in nombres:
+                    aliases[nombre] = clave
 
         self.alias = aliases
 
@@ -156,6 +141,7 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
 
 def main() -> None:
     print("Clase básica para generar tablas de propiedades basadas en pandas.")
+
 
 if __name__ == "__main__":
     main()
