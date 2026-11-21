@@ -14,7 +14,9 @@ class SubstanceEnumMeta(EnumMeta):
 
         rows = [
             (nombre_es, nombre_en, formula)
-            for formula, nombre_es, nombre_en in (member.value for member in cls)
+            for formula, nombre_es, nombre_en in (
+                member.value for member in cls
+            )
         ]
 
         widths = [
@@ -22,12 +24,16 @@ class SubstanceEnumMeta(EnumMeta):
             for i, header in enumerate(headers)
         ]
 
-        header = " | ".join(f"{name:<{width}}" for name, width in zip(headers, widths))
+        header = " | ".join(
+            f"{name:<{width}}" for name, width in zip(headers, widths)
+        )
 
         separator = "-+-".join("-" * width for width in widths)
 
         body = [
-            " | ".join(f"{value:<{width}}" for value, width in zip(row, widths))
+            " | ".join(
+                f"{value:<{width}}" for value, width in zip(row, widths)
+            )
             for row in rows
         ]
 
@@ -43,22 +49,25 @@ class SubstanceEnumMeta(EnumMeta):
 
 class Substance(Enum, metaclass=SubstanceEnumMeta):
     """
-    Clase basada enb "Enum". Contiene el listado de las sustancias disponibles
+    Clase basada en "Enum". Contiene el listado de las sustancias disponibles
     en el webbook del NIST (abierto) con la fórmula, el nombre en inglés y en
     español como valores (como tupla) y el ID como nombre. Incorpora un método
     (`from_alias`) que permite crear el objeto desde alguno de los valores
     (se recomienda esa forma de uso). Por ejemplo, las siguientes formas son
     todas equivalentes:
+
     ´´´Python
     sust = Substance.from_alias("agua")
     sust = Substance.from_alias("water")
     sust = Substance.from_alias("H2O")
     ´´´
 
-    Si en `busqeuda_web_nist` se quiere usar una sustancia diferente al agua,
+    Si en `busqueda_web_nist` se quiere usar una sustancia diferente al agua,
     se debe llamar primero a esta clase (por ejemplo, `sust = Substance("H2")`)
-    y luego pasar sust como valor del argumento `sustancia` en `busqeuda_web_nist`.
-    Internamente, esa función leerá el ID para el NIST desde sust.nist_id.
+    y luego pasar sust como valor del argumento `sustancia` en
+    `busqueda_web_nist`. Internamente, esa función leerá el ID para el NIST
+    desde sust.nist_id.
+
     Para ver el listado de sustancias disponibles, ejecutar:
     `print(Substance)`
     """
@@ -141,9 +150,21 @@ class Substance(Enum, metaclass=SubstanceEnumMeta):
         "1-Chloro-1,2,2,2-tetrafluoroethane",
     )
     C354336 = ("C2HF5", "Pentafluoroetano", "Pentafluoroethane")
-    C811972 = ("C2H2F4", "1,1,1,2-Tetrafluoroetano", "1,1,1,2-Tetrafluoroethane")
-    C1717006 = ("C2H3Cl2F", "1,1-Dicloro-1-fluoroetano", "1,1-Dichloro-1-fluoroethane")
-    C75683 = ("C2H3ClF2", "1-Cloro-1,1-difluoroetano", "1-Chloro-1,1-difluoroethane")
+    C811972 = (
+        "C2H2F4",
+        "1,1,1,2-Tetrafluoroetano",
+        "1,1,1,2-Tetrafluoroethane",
+    )
+    C1717006 = (
+        "C2H3Cl2F",
+        "1,1-Dicloro-1-fluoroetano",
+        "1,1-Dichloro-1-fluoroethane",
+    )
+    C75683 = (
+        "C2H3ClF2",
+        "1-Cloro-1,1-difluoroetano",
+        "1-Chloro-1,1-difluoroethane",
+    )
     C420462 = ("C2H3F3", "1,1,1-Trifluoroetano", "1,1,1-Trifluoroethane")
     C75376 = ("C2H4F2", "1,1-Difluoroetano", "1,1-Difluoroethane")
 
@@ -163,8 +184,16 @@ class Substance(Enum, metaclass=SubstanceEnumMeta):
         "1,1,1,3,3,3-Hexafluoropropano",
         "1,1,1,3,3,3-Hexafluoropropane",
     )
-    C679867 = ("C3H3F5", "1,1,2,2,3-Pentafluoropropano", "1,1,2,2,3-Pentafluoropropane")
-    C460731 = ("C3H3F5", "1,1,1,3,3-Pentafluoropropano", "1,1,1,3,3-Pentafluoropropane")
+    C679867 = (
+        "C3H3F5",
+        "1,1,2,2,3-Pentafluoropropano",
+        "1,1,2,2,3-Pentafluoropropane",
+    )
+    C460731 = (
+        "C3H3F5",
+        "1,1,1,3,3-Pentafluoropropano",
+        "1,1,1,3,3-Pentafluoropropane",
+    )
     C115253 = ("C4F8", "Octafluorociclobutano", "Octafluorocyclobutane")
 
     C71432 = ("C6H6", "Benceno", "Benzene")

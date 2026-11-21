@@ -41,7 +41,14 @@ UNIDADES_VALIDAS = {
     "TUnit": ("K", "ºC", "ºF", "R"),
     "PUnit": ("MPa", "bar", "atm", "torr", "psia"),
     "DUnit": ("kg/m3", "mol/l", "mol/m3", "g/l", "lb-mole/ft3", "lbm/ft3"),
-    "HUnit": ("kJ/mol", "kJ/kg", "kcal/mol", "Btu/lb-mol", "kcal/g", "Btu/lbm"),
+    "HUnit": (
+        "kJ/mol",
+        "kJ/kg",
+        "kcal/mol",
+        "Btu/lb-mol",
+        "kcal/g",
+        "Btu/lbm",
+    ),
     "WUnit": ("m/s", "ft/s", "mph"),
     "VisUnit": ("uPa*s", "Pa*s", "cP", "lbm/ft*s"),
     "STUnit": ("N/m", "dyn/cm", "lb/ft", "lb/in"),
@@ -106,46 +113,13 @@ SUSTANCIA_POR_DEFECTO = Substance.from_alias("agua")
 
 
 def main() -> None:
-    """
-    Todo lo que está acá sirve de ejemplo cuando se ejecuta el script con:
+    print("""
+    'main' sin ningún efecto o implementación.\n
+    Para visualizar algunos ejemplos, ver el cuaderno\n
+    datos_nist_web_ejemplos.ipynb 
+    """)
 
-    uv run datos_nist_web.py
-
-    Pero no se ejecutará cuando se importe "busqueda_web_nist"
-    """
-
-    data_table = busqueda_web_nist(
-        tipo_busq="IsoBar",
-        iso_value=0.1,
-        rg_min=373,
-        rg_max=573,
-        rg_interval=20,
-    )
-
-    print("Impresión de la tabla de prueba completa:")
-    print(data_table.to_string(index=False))
-    print("\nProbando el retorno de una columna por nombre:")
-    print("filas 2-5 de temperatura: ")
-    for val in data_table["Temperature"][2:6]:
-        print(f" * T = {val}")
-
-    print("\nImpresión de un extracto de la tabla con un subconjunto de propiedades:")
-    table_red = data_table[["T", "P", "u", "h", "s"]]
-    # La opción más larga según este ejemplo sería:
-    """
-    table_red = data_table[
-        [
-            "Temperature",
-            "Pressure",
-            "Internal Energy",
-            "Enthalpy",
-            "Entropy",
-        ]
-    ]
-    """
-    print(table_red)
-    print(table_red["h"])
-    print(data_table.alias)
+    return
 
 
 # Función principal de búsqueda
@@ -185,7 +159,7 @@ def busqueda_web_nist(
 
     rg_min, rg_max, rg_interval: float
         Límites e intervalo de la variable que cambia, de acuerdo con la
-        selección para `iso_var` y las unidades seleccionadas.
+        selección para `tipo_busq` y las unidades seleccionadas.
 
     decimales: int, opcional (default 12)
         Cantidad de dígitos solicitados al NIST. Debe ser un entero entre 5 y 12.
@@ -262,7 +236,9 @@ def obtencion_datos(consulta, tipo_busq):
 
     # Primero invertimos el diccionario de alias localmente:
     alias_inv = {
-        nombre: key for key, nombres in ALIAS_BASE.items() for nombre in nombres
+        nombre: key
+        for key, nombres in ALIAS_BASE.items()
+        for nombre in nombres
     }
 
     texto = consulta.text.splitlines()
@@ -291,15 +267,28 @@ def obtencion_datos(consulta, tipo_busq):
     # su valor será `None` al recuperar los grupos mediante `.groups()`.
 
     if tipo_busq not in ["SatT", "SatP"]:
-        # Una sola fase: reconstrucción directa de datos y encabezados.
-        encabezados_mod = []
-        for encabezado in encabezados:
-            nombre = patron_encabezado.match(encabezado).group(1)
-            encabezados_mod.append(alias_inv.get(nombre, "¿" + nombre + "?"))
+        # Una sola fase: reconstrucción directa de datos, encabezados y
+        # unidades.
 
-        # 2. Reconstrucción de datos como texto.
+        encabezados_mod = []
+        unidades = {}
+
+        for encabezado in encabezados:
+            nombre, _, unidad = patron_encabezado.match(encabezado).groups()
+
+            variable = alias_inv.get(nombre, "¿" + nombre + "?")
+
+            encabezados_mod.append(variable)
+            unidades[variable] = unidad
+
+        # Reconstrucción de datos como texto.
         datos = "\n".join(texto[1:])
-        return PropData(datos, encabezados_mod, ALIAS_BASE)
+        return PropData(
+            datos,
+            encabezados=encabezados_mod,
+            unidades=unidades,
+            alias_base=ALIAS_BASE,
+        )
 
     # Si llegó hasta acá es porque fue una búsqueda en condiciones de
     # saturación. Tenemos que separar los datos leídos y devolver dos tablas.
@@ -345,8 +334,18 @@ def obtencion_datos(consulta, tipo_busq):
     )
 
     return (
-        PropData(datos_liq, encabezados_liq, ALIAS_BASE),
-        PropData(datos_vap, encabezados_vap, ALIAS_BASE),
+        PropData(
+            datos_liq,
+            encabezados=encabezados_liq,
+            unidades=unidades_liq,
+            alias_base=ALIAS_BASE,
+        ),
+        PropData(
+            datos_vap,
+            encabezados=encabezados_vap,
+            unidades=unidades_vap,
+            alias_base=ALIAS_BASE,
+        ),
     )
 
 
@@ -363,9 +362,19 @@ def validar_entradas_y_crear_parametros(
     unidades: dict[str, str],
 ) -> dict:
 
-    # Determinación del valor adecuado de tipo_busq (puede resultar "None", en
-    # cuyo caso se arroja un error en el bloque `match`).
+    # Determinación del valor adecuado de tipo_busq.
     tipo_busq = get_case_insensitive(tipo_busq)
+
+    # Comprobación del valor de tipo_busq:
+    if tipo_busq is None:
+        raise ValueError("""
+            'tipo_busq' debe ser compatible con:\n"
+                * 'IsoBar'\n
+                * 'IsoTherm'\n
+                * 'IsoChor'\n
+                * 'SatP'\n
+                * 'SatT'\n
+            """)
 
     # Comprobación sobre iso_value si corresponde:
     validar_numeros(iso_value, "iso_value", tipo_busq)
@@ -420,39 +429,28 @@ def validar_entradas_y_crear_parametros(
             parametros_variables["PHigh"] = rg_max
             parametros_variables["PInc"] = rg_interval
 
-        case _:
-            raise ValueError(f"""
-                'iso_var' debe ser compatible con:\n"
-                 * 'IsoBar'\n
-                 * 'IsoTherm'\n
-                 * 'IsoChor'\n
-                 * 'SatP'\n
-                 * 'SatT'\n
-                pero se ingresó el valor: {tipo_busq}
-                """)
-
     return {**PARAMETROS_FIJOS, **unidades_finales, **parametros_variables}
 
 
-def validar_numeros(valor, nombre, iso_var):
-    if nombre == "iso_value" and iso_var in {"SatP", "SatT"}:
+def validar_numeros(valor, nombre, tipo_busq):
+    if nombre == "iso_value" and tipo_busq in ("SatP", "SatT"):
         # Puede ser None o cualquier otra cosa, el valor no se usará. No es
         # necesario continuar con la validación
         return
 
     if valor is None:
-        if iso_var is None:  # valor no se trata de iso_value.
+        if tipo_busq is None:  # valor no se trata de iso_value.
             raise ValueError(f"{nombre} es obligatorio")
-        elif iso_var in {"IsoBar", "IsoTherm", "IsoChor"}:
+        elif tipo_busq in {"IsoBar", "IsoTherm", "IsoChor"}:
             if nombre == "iso_value":
-                raise ValueError(f"iso_value es obligatorio para {iso_var}")
+                raise ValueError(f"iso_value es obligatorio para {tipo_busq}")
             else:
                 # En rigor, si llegó hasta acá, va a fallar en la próxima comprobación.
                 # De todas maneras, dejamos la impresión del warning, porque puede
                 # ser informativo.
                 warnings.warn(
                     f"""
-                    La combinación {valor = }, {nombre = } y {iso_var = }\n
+                    La combinación {valor = }, {nombre = } y {tipo_busq = }\n
                     sugiere un error en la entrada. Se continúa con las comprobaciones...
                     """
                 )
@@ -462,7 +460,9 @@ def validar_numeros(valor, nombre, iso_var):
 
     try:
         if valor < 0 or not math.isfinite(valor):
-            raise ValueError(f"{nombre} debe ser finito y mayor o igual que cero.")
+            raise ValueError(
+                f"{nombre} debe ser finito y mayor o igual que cero."
+            )
     except OverflowError:
         raise ValueError(f"{nombre} debe ser finito y mayor o igual que cero.")
 
@@ -502,7 +502,7 @@ def get_case_insensitive(
     if not isinstance(key, str):
         raise TypeError("Se esperaba un `str` o `None`.")
 
-    return TIPOS_BUSQ_VALIDAS.get(key.casefold())
+    return TIPOS_BUSQ_VALIDAS.get(key.casefold(), None)
 
 
 if __name__ == "__main__":
