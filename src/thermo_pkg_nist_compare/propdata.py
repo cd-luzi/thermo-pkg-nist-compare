@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 
 
-# Esta breve clase es para evitar que `help PropData` agregue la extensa lista de información sobre pandas.
+# Esta breve clase es para evitar que `help PropData` agregue la extensa lista
+# de información sobre pandas.
 class _PropDataHelpMeta(type):
     def __dir__(cls):
         local = set(cls.__dict__)
@@ -48,9 +49,9 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
     la documentación de pandas.DataFrame.
     """
 
-    # Atributos personalizados que pandas conserva al crear copias o subconjuntos.
-    # La tupla —("alias",)— evita usar una lista mutable —["alias"]— como atributo
-    # de clase.
+    # Atributos personalizados que pandas conserva al crear copias o
+    # subconjuntos. La tupla —("alias",)— evita usar una lista mutable
+    # —["alias"]— como atributo de clase.
     _metadata = ("alias", "unidades")
 
     def __init__(
@@ -123,8 +124,8 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
                     "se quiere es leer datos desde la web del NIST"
                 )
             elif "\n" in datos or "\t" in datos or "," in datos:
-                # StringIO hace que pandas reciba el texto de la misma forma que
-                # si estuviera leyendo un archivo.
+                # StringIO hace que pandas reciba el texto de la misma forma
+                # que si estuviera leyendo un archivo.
                 fuente = StringIO(datos)
             else:
                 fuente = datos  # Ruta de archivo

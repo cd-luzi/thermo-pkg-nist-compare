@@ -78,9 +78,9 @@ ALIAS_BASE = {
     "ph": ("Phase", "Fase"),
 }
 
-# Diccionario para definir el tipo de búsqueda, incorporando diferentes variantes
-# que podría escribir el usuario. Como la búsqueda se hará sin tener en cuenta
-# las mayúsculas usamos en cada clave `.casefold()`.
+# Diccionario para definir el tipo de búsqueda, incorporando diferentes
+# variantes que podría escribir el usuario. Como la búsqueda se hará sin tener
+# en cuenta las mayúsculas usamos en cada clave `.casefold()`.
 TIPOS_BUSQ_VALIDAS = {
     "T cte".casefold(): "IsoTherm",
     "T cte.".casefold(): "IsoTherm",
@@ -152,8 +152,8 @@ def busqueda_web_nist(
 
     iso_value : float o None
         Presión fija en las unidades seleccionadas (MPa por defecto), si
-        tipo_busq="IsoBar". Temperatura fija en las unidades seleccionadas (K por
-        defecto), si tipo_busq="IsoTherm". Densidad fija en las unidades
+        tipo_busq="IsoBar". Temperatura fija en las unidades seleccionadas (K
+        por defecto), si tipo_busq="IsoTherm". Densidad fija en las unidades
         seleccionadas (kg/m^3 por defecto), si tipo_busq="IsoChor". None o
         cualquier valor en caso contrario (no se utiliza).
 
@@ -162,14 +162,15 @@ def busqueda_web_nist(
         selección para `tipo_busq` y las unidades seleccionadas.
 
     decimales: int, opcional (default 12)
-        Cantidad de dígitos solicitados al NIST. Debe ser un entero entre 5 y 12.
+        Cantidad de dígitos solicitados al NIST. Debe ser un entero entre 5 y
+        12.
 
     sustancia: Substance, opcional (default, agua)
         Objeto `Substance`, que contiene información del ID para el NIST. Se
         crea con sustancia = Substance.from_alias("nombre"), donde nombre puede
         ser el nombre común de la sustancia en Español o en Inglés o la fórmula
-        química (ejemplo: "agua", "water", "H2O"). El listado se puede consultar
-        en el módulo substancelist.py.
+        química (ejemplo: "agua", "water", "H2O"). El listado se puede
+        consultar en el módulo substancelist.py.
 
     unidades: dict[str, str] o None (valor por defecto)
         Si se ingresa un diccionario, sus claves deben coincidir con algunas de
@@ -178,14 +179,14 @@ def busqueda_web_nist(
          * "PUnit":   unidades para la presión.
          * "DUnit":   unidades para la densidad (y por extensión, para el
                       volumen)
-         * "HUnit":   unidades para los potenciales termodinámicos. Las unidades
-                      de la entropía, los calores específicos, el coeficiente
-                      Joule-Thomson y la conductividad térmica se derivan de
-                      este, TUnit y PUnit.
+         * "HUnit":   unidades para los potenciales termodinámicos. Las
+                      unidades de la entropía, los calores específicos, el
+                      coeficiente Joule-Thomson y la conductividad térmica se
+                      derivan de este, TUnit y PUnit.
          * "WUnit":   unidades para la velocidad del sonido
          * "VisUnit": unidades para la viscosidad
-         * "STUnit":  unidades para la tensión superficial (solo en fase líquida
-                      para los datos de equilibrio de fases)
+         * "STUnit":  unidades para la tensión superficial (solo en fase
+                      líquida para los datos de equilibrio de fases)
         Cualquier otro par clave-valor se ignora. Las unidades dadas deben ser
         válidas y respetar mayúsculas y minúsculas en este caso, para evitar
         ambigüedades. Para consultar el listado de unidades posibles y la forma
@@ -445,13 +446,14 @@ def validar_numeros(valor, nombre, tipo_busq):
             if nombre == "iso_value":
                 raise ValueError(f"iso_value es obligatorio para {tipo_busq}")
             else:
-                # En rigor, si llegó hasta acá, va a fallar en la próxima comprobación.
-                # De todas maneras, dejamos la impresión del warning, porque puede
-                # ser informativo.
+                # En rigor, si llegó hasta acá, va a fallar en la próxima
+                # comprobación. De todas maneras, dejamos la impresión del
+                # warning, porque puede ser informativo.
                 warnings.warn(
                     f"""
                     La combinación {valor = }, {nombre = } y {tipo_busq = }\n
-                    sugiere un error en la entrada. Se continúa con las comprobaciones...
+                    sugiere un error en la entrada. Se continúa con las
+                    comprobaciones...
                     """
                 )
 
