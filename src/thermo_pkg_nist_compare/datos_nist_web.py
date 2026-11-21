@@ -152,8 +152,8 @@ def busqueda_web_nist(
 
     iso_value : float o None
         Presión fija en las unidades seleccionadas (MPa por defecto), si
-        tipo_busq="IsoBar". Temperatura fija en las unidades seleccionadas (K por
-        defecto), si tipo_busq="IsoTherm". Densidad fija en las unidades
+        tipo_busq="IsoBar". Temperatura fija en las unidades seleccionadas (K
+        por defecto), si tipo_busq="IsoTherm". Densidad fija en las unidades
         seleccionadas (kg/m^3 por defecto), si tipo_busq="IsoChor". None o
         cualquier valor en caso contrario (no se utiliza).
 
