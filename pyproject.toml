@@ -5,6 +5,7 @@ description = "Comparación básica de paquetes termodinámicos contra datos rec
 requires-python = ">=3.14"
 dependencies = [
     "coolprop>=8.0.0",
+    "great-tables>=1.1.0",
     "iapws>=1.5.5",
     "ipykernel>=7.4.0",
     "matplotlib>=3.11.2",
@@ -12,6 +13,7 @@ dependencies = [
     "pandas<2.3",
     "requests>=2.34.2",
     "scipy>=1.18.1",
+    "selenium>=4.53.0",
     "thermochem>=0.9.0",
 ]
 
@@ -21,3 +23,16 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/thermo_pkg_nist_compare"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.6",
+]
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "E501"]
+
+
