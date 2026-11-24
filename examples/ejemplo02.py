@@ -1,4 +1,4 @@
-from graficadora import graficar
+from thermo_pkg_nist_compare.graficadora import graficar
 import numpy as np
 
 x = np.array([0, 1, 2, 3, 4])
