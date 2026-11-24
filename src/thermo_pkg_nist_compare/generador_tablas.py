@@ -5,16 +5,47 @@ import pandas as pd
 from great_tables import GT
 
 #pip install great_tables
-def tabular(x, y, titulo_1="NIST", x_comp=None, y_comp=None, titulo_2="Otro" ,comienzo=None, fin=None, espaciado=None, decimales=3, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True):
+def tabular(x, y, titulo_1="NIST", x_comp=None, y_comp=None, titulo_2="Otro",comienzo=None, fin=None, espaciado=None, decimales=3, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True):
     """
-    Genera una tabla con valores interpolados de (x, y) y la guarda como imagen.
+    Genera una tabla con uno o dos sets de datos (x, y), interpolados o tal cual.
 
-    Interpola con un spline cuadrático desde `comienzo` cada `espaciado`, sin pasarse de `fin`, incluyéndolo.
-    Por defecto: comienzo=x[0], fin=x[-1], espaciado=(fin-comienzo)/20.
-    `decimales` fija cuántos decimales se muestran en la tabla.
+    El set principal (x, y) ocupa las dos primeras columnas. Si se pasan x_comp e y_comp, se agrega
+    un segundo set de comparación en dos columnas más, y cada set lleva arriba su
+    subtítulo (titulo_1 y titulo_2) para identificarlo. Con un solo set no se muestran subtítulos.
+    Si los sets tienen distinto largo, las celdas que sobran quedan vacías.
 
-    Si se pasan nombres y unidades de las variables, guarda la tabla como PNG
-    en la carpeta "Tablas". Si falta alguno, no la gguarda, solo la genera.
+    Si interpolar es True, cada set se reemplaza por su interpolación: un spline cuadrático
+    evaluado desde comienzo cada espaciado, hasta fin e incluyéndolo. Si es False,
+    se usan los datos tal cual.
+
+    Si se pasan los nombres y las unidades de las dos variables, la tabla se guarda como PNG
+    en la carpeta "Tablas" (se crea si no existe), con las variables y el rango en el nombre del
+    archivo. Si falta alguno, se muestra con encabezados genéricos y no se guarda.
+
+    Parámetros:
+        x, y : array
+            Datos del set principal.
+        titulo_1 : str, opcional
+            Subtítulo del set principal. Por defecto, "NIST".
+        x_comp, y_comp : array, opcional
+            Datos del set de comparación. Si no se pasan, o tienen distinto largo entre sí,
+            se tabula solo el set principal.
+        titulo_2 : str, opcional
+            Subtítulo del set de comparación. Por defecto, "Otro".
+        comienzo : float, opcional
+            Valor de x donde empieza la tabla. Por defecto, x[0].
+        fin : float, opcional
+            Valor de x donde termina la tabla, incluido. Por defecto, x[-1].
+        espaciado : float, opcional
+            Paso entre valores de x. Por defecto, |x[-1] - x[0]| / 20.
+        decimales : int, opcional
+            Cantidad de decimales que se muestran. Por defecto, 3.
+        nombre_x, nombre_y : str, opcional
+            Nombres de las variables, para los encabezados, el título y el nombre del archivo.
+        unidad_x, unidad_y : str, opcional
+            Unidades de las variables, para los encabezados.
+        interpolar : bool, opcional
+            Si es True (por defecto), tabula los valores interpolados. Si es False, se usan los datos originales.
     """
     if not(espaciado):
         espaciado = abs((x[0]-x[-1])/20)
@@ -86,8 +117,8 @@ def tabular(x, y, titulo_1="NIST", x_comp=None, y_comp=None, titulo_2="Otro" ,co
         tabla = (
             tabla
             .cols_label({"x_2":variable_x_comp, "y_2":variable_y_comp})
-            .tab_spanner(label=titulo_1, columns=[variable_x, variable_y])
-            .tab_spanner(label=titulo_2, columns=[variable_x_comp, variable_y_comp])
+            .tab_spanner(label=titulo_1, columns=["x_1", "y_1"])
+            .tab_spanner(label=titulo_2, columns=["x_2", "y_2"])
             .sub_missing(missing_text="")
         )
 
