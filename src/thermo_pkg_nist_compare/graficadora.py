@@ -3,7 +3,7 @@ import numpy as np
 from interpolacion import interpolacion
 from pathlib import Path
 
-def graficar(x, y, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, color='m', linewidth=1, markersize=40):
+def graficar(x, y, label_1="NIST", x_comp=None, y_comp=None, label_2=None, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True, color='m', linewidth=1, markersize=40):
     """
     Grafica los datos (x, y) como puntos, junto con su curva interpolada.
 
@@ -14,10 +14,22 @@ def graficar(x, y, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, c
     Se puede elegir color, linewidth y markersize para controlar el color, el grosor de la curva
     y el tamaño de los puntos.
     """
-    curva_x, curva_y = interpolacion(x, y, espaciado=0.05)
+    if interpolar:
+        curva_x, curva_y = interpolacion(x, y, espaciado=0.05)
+        plt.plot(curva_x, curva_y, linewidth=linewidth, color=color)
 
-    plt.plot(curva_x, curva_y, linewidth=linewidth, color=color)
-    plt.scatter(x, y, marker='h', color=color, s=markersize, alpha=0.6)
+    plt.scatter(x, y, marker='h', color=color, s=markersize, alpha=0.6, label=label_1)
+
+    try:
+        if interpolar:
+            curva_comp_x, curva_comp_y = interpolacion(x_comp, y_comp, espaciado=0.05)
+            plt.plot(curva_comp_x, curva_comp_y, linewidth=linewidth, linestyle='dashed', color='b')
+        plt.scatter(x_comp, y_comp, marker='o', color='b', s=markersize/2, alpha=0.6, label=label_2)
+        plt.legend()
+    except (TypeError, ValueError):
+        pass
+    
+    
     plt.grid(alpha=0.7, linestyle='--')
 
     guardar = True
