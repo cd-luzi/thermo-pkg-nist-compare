@@ -3,16 +3,43 @@ import numpy as np
 from interpolacion import interpolacion
 from pathlib import Path
 
-def graficar(x, y, label_1="NIST", x_comp=None, y_comp=None, label_2=None, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True, color='m', linewidth=1, markersize=40):
+def graficar(x, y, label_1="NIST", x_comp=None, y_comp=None, label_2="Otro", nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True, color='m', linewidth=1, markersize=40):
     """
-    Grafica los datos (x, y) como puntos, junto con su curva interpolada.
+    Grafica uno o dos sets de datos (x, y) como puntos y, opcionalmente, sus curvas interpoladas.
 
-    La curva sale de un spline cuadrático evaluado cada 0.05 entre x[0] y x[-1].
-    Si se pasan nombres y unidades de las variables, guarda el gráfico como PNG
-    en la carpeta "Graficos". Si falta alguno, lo muestra con ejes genéricos y no lo guarda.
+    El set principal (x, y) se dibuja con hexágonos del color elegido. Si se pasan x_comp e y_comp,
+    se agrega un segundo set de comparación con círculos azules, de la mitad del tamaño, y se muestra
+    una leyenda con label_1 y label_2 para identificar cada set. Con un solo set no se muestra leyenda.
 
-    Se puede elegir color, linewidth y markersize para controlar el color, el grosor de la curva
-    y el tamaño de los puntos.
+    Si interpolar es "True", se agrega su curva interpolada: un spline cuadrático evaluado
+    cada 0.05 entre el primer y el último valor de x. La del set principal es una línea continua y la
+    del set de comparación, una línea punteada.
+
+    Si se pasan los nombres y las unidades de las dos variables, el gráfico se titula y se guarda como PNG
+    en la carpeta "Graficos" (se crea si no existe). Si falta alguno, se muestra con ejes genéricos
+    y no se guarda.
+
+    Parámetros:
+        x, y : array
+            Datos del set principal.
+        label_1 : str, opcional
+            Nombre del set principal en la leyenda. Por defecto, "NIST".
+        x_comp, y_comp : array, opcional
+            Datos del set de comparación. Si no se pasan, se grafica solo el set principal.
+        label_2 : str, opcional
+            Nombre del set de comparación en la leyenda. Si no se pasa, ese set no aparece en la leyenda.
+        nombre_x, nombre_y : str, opcional
+            Nombres de las variables, para los ejes, el título y el nombre del archivo.
+        unidad_x, unidad_y : str, opcional
+            Unidades de las variables, para los ejes.
+        interpolar : bool, opcional
+            Si es True (por defecto), dibuja las curvas interpoladas. Si es False, solo los puntos.
+        color : str, opcional
+            Color del set principal. Por defecto, magenta.
+        linewidth : float, opcional
+            Grosor de las curvas interpoladas de los dos sets.
+        markersize : float, opcional
+            Tamaño de los puntos del set principal. Los del set de comparación miden la mitad.
     """
     if interpolar:
         curva_x, curva_y = interpolacion(x, y, espaciado=0.05)
@@ -28,7 +55,6 @@ def graficar(x, y, label_1="NIST", x_comp=None, y_comp=None, label_2=None, nombr
         plt.legend()
     except (TypeError, ValueError):
         pass
-    
     
     plt.grid(alpha=0.7, linestyle='--')
 
