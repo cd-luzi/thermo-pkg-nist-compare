@@ -3,7 +3,7 @@ import numpy as np
 from interpolacion import interpolacion
 from pathlib import Path
 
-def graficar(x, y, label_1="NIST", x_comp=None, y_comp=None, label_2=None, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True, color='m', linewidth=1, markersize=40):
+def graficar(x, y, label_1="NIST", x_comp=None, y_comp=None, label_2="Otro", nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True, color='m', linewidth=1, markersize=40):
     """
     Grafica uno o dos sets de datos (x, y) como puntos y, opcionalmente, sus curvas interpoladas.
 
@@ -55,7 +55,6 @@ def graficar(x, y, label_1="NIST", x_comp=None, y_comp=None, label_2=None, nombr
         plt.legend()
     except (TypeError, ValueError):
         pass
-    
     
     plt.grid(alpha=0.7, linestyle='--')
 
