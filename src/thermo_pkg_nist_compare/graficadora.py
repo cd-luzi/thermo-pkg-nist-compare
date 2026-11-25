@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from interpolacion import interpolacion
+from thermo_pkg_nist_compare.interpolacion import interpolacion
 from pathlib import Path
 
 def graficar(x, y, label_1="NIST", x_comp=None, y_comp=None, label_2="Otro", nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True, color='m', linewidth=1, markersize=40):
