@@ -1,5 +1,5 @@
 import numpy as np
-from interpolacion import interpolacion
+from .interpolacion import interpolacion
 from pathlib import Path
 import pandas as pd
 from great_tables import GT
