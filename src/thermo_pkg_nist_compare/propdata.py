@@ -76,9 +76,11 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
                     for alias, columna in aliases.items()
                     if columna in self.columns
                 }
-                self._catalogo_alias = dict(
-                    getattr(datos, "_catalogo_alias", alias_base)
-                )
+
+                catalogo_alias = getattr(datos, "_catalogo_alias", None)
+                if catalogo_alias is None:
+                    catalogo_alias = aliases
+                self._catalogo_alias = dict(catalogo_alias)
 
             if unidades is not None:
                 self.unidades = unidades

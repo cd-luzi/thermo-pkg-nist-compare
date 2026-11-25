@@ -1,4 +1,4 @@
-from thermo_pkg_nist_compare.generador_tablas import tabular
+from thermo_pkg_nist_compare import tabular
 import numpy as np
 import os
 

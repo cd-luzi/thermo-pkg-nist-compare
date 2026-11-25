@@ -1,4 +1,4 @@
-from thermo_pkg_nist_compare.graficadora import graficar
+from thermo_pkg_nist_compare import graficar
 import numpy as np
 
 

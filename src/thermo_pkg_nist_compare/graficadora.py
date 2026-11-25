@@ -130,7 +130,7 @@ def graficar(
     if guardar:
         plt.title(
             f"{nombre_y.capitalize()} vs. {nombre_x.lower()},"
-            f" para valores entre {x[0]} y {x[-1]}"
+            f" para valores entre {x[0]:.2f} y {x[-1]:.2f}"
         )
         if carpeta is None:
             carpeta = Path("Graficos")
@@ -142,7 +142,7 @@ def graficar(
         carpeta.mkdir(parents=True, exist_ok=True)
         nombre_archivo = (
             f"{nombre_y.lower()}_vs_{nombre_x.lower()}_"
-            f"rango_{x[0]}_{x[-1]}.png"
+            f"rango_{x[0]:.2f}_{x[-1]:.2f}.png"
         )
         plt.savefig(carpeta / nombre_archivo)
 
