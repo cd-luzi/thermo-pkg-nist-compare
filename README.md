@@ -1,59 +1,65 @@
-# Descripción
-El proyecto busca comparar datos termodinámicos, en principio limitados al agua como vapor sobrecalentado o en equilibrio líquido-vapor, obtenidos de la página del NIST, frente a los datos calculados con diferentes paquetes termodinámicos de Python, como "thermochem" entre otros. Corresponde al proyecto final del curso [Python Científico](https://wpregliasco.github.io/python-sci/), del Instituto Balseiro.
+# Thermo_pkg_nist_compare
 
-[_Nota: este readme aún se debe completar para adecuarlo a la estructura sugerida al terminar_]
-<br>
+## Destacados
+* Busqueda de propiedades termodinámicas en el WebBook del NIST.
+* Estimación de propiedades termodinámicas mediante CoolProp.
+* Gráficos comparativos, interpolación y salidas en forma de tablas.
 
-# _De uso interno, para eliminar al terminar_
+## Descripción
+Proyecto que facilita la comparación de datos termodinámicos de diferentes sustancias disponibles en forma gratuita en la [web del NIST](https://webbook.nist.gov/chemistry/fluid/), limitados a condición supercrítica, vapor sobrecalentado o equilibrio líquido-vapor, frente a los datos calculados con el paquete [CoolProp](https://coolprop.org/) de Python. Si la sustancia elegida es el agua, este último permite elegir entre dos tipos de variantes (IAPWS95 y IAPWS-97).
 
-<div style="background-color: #f0eca2; padding: 5px; color: #000000"; markdown="1">
-<b>NOTA</b>: <i>Cambié el nombre del repositorio y del paquete. Los cambios en la estructura se debería cargar cuando hagan "pull". no obstante, deberían actualizar la url del proyecto, ejecutando:</i>
+Este paquete corresponde al proyecto final del curso [Python Científico](https://wpregliasco.github.io/python-sci/), del [Instituto Balseiro](https://www.ib.edu.ar/).
 
-```bash
-git remote set-url origin https://github.com/cd-luzi/thermo-pkg-nist-compare.git
+### Autores
+* Jazmín Luminari - https://github.com/jazminluminari
+* Carolina Cogo - https://github.com/caro-88
+* Carlos Luzi - https://github.com/cd-luzi
+
+## Modo de empleo
+Elección de sustancia (web) y búsqueda web:
+```python
+>>> from thermo_pkg_nist_compare.datos_web_nist import busqueda_web_nist
+>>> from thermo_pkg_nist_compare.substancelist import Substance
+>>> s = Substance.from_alias("benceno")
+>>> data_table = busqueda_web_nist(
+>>>     tipo_busq="IsoTherm",
+>>>     iso_value=383,
+>>>     rg_min=0.5,
+>>>     rg_max=15,
+>>>     rg_interval=0.5,
+>>>     unidades = {
+>>>         "PUnit": "bar",
+>>>         "HUnit": "kJ/kg",
+>>>         },
+>>>     sustancia = sust,
+>>> )
+
 ```
 
-</div>
+Graficadora de datos, con posibilidad de pasar por separado nombres y unidades.
 
+```py
+>>> from thermo_pkg_nist_compare.graficadora import graficar
+>>> import numpy as np
+>>> x = np.array([0, 1, 2, 3, 4])
+>>> y = np.array([0, 0.8, 0.9, 0.1, -0.8])
+>>> graficar(x, y, nombre_x="temperatura", nombre_y="presion", unidad_x="°C", unidad_y="Pa")
+```
 
-## Aspectos que tendríamos que cubrir
-* Obtención de datos de la web del NIST (¿uso del paquete requests?) y generación de "tabla de datos" local
-* Procesamiento de esos datos en forma de funciones para poder obtener y/o graficar datos isoentálpicos, isoentrópicos, etc.
-* Uso y manejo del paquete thermochem para la generación del mismo juego de datos.
-* Comparación y presentación
+Uso de CoolProp: se sufiere consultar la web oficial: [CoolProp](https://coolprop.org/)
 
-## Posibles librerías a emplear
-### Generales
-* numpy
-* scipy?
-* pandas (para la gestión de los datos como tablas y su visualización)
-* matplotlib
-* requests
+## Instalación
+Se sugiere instalarlo empleando `uv`.
 
-### Vinculados a datos y funciones termodinámicas
-* CoolProp (alternativa abierta más cercana a NIST REFPROP)
-* iapws: Implementa exclusivamente los estándares de la International Association for the Properties of Water and Steam (IAPWS-95, IAPWS-IF97, etc.)
-* thermochem
+Desde una carpeta local:
 
-## Organización
+```bash
+uv add ../thermo-pkg-nist-compare
+```
 
-Carlos:
-Lectura de datos: leer de internet y bajarlos a un directorio o leerlos del directorio (en caso de que ya estén bajados los datos)
-¿Agregar un "módulo" que donde se defina los valores y condiciones de búsqueda para los casos base y que se lean a través de las diferentes funciones?
--------------------------------------------------------------------------------
-ver como hacer para pasar de la tabla de salida a los arrays que necesita la función de interpolación como entrada
--------------------------------------------------------------------------------
+Desde el repositorio de github:
+```bash
+uv add git+https://github.com/cd-luzi/thermo-pkg-nist-compare
+```
 
-Jazmin:
-Interpolación de los datos: 
-    -Se puede usar : np.interp (numpy), scipy.interpolate o DataFrame.interpolate (pandas)
-    -obtener curvas para graficar, ej h vs P en curvas isotérmicas
-    -tablas con algunas propiedades. Se debe poder elegir el rango, la cantidad de datos fija, como opción refinar el paso. 
-    -Salidas finales: gráficos y las tablas. Decidir como guardarlas.
-
--------------------------------------------------------------------------------
-
-Carolina:
-Utilizar los paquetes de termodinámica cargados: coolprop, thermochem, iapws para obtener las mismas salidas, que sean comparables con los resultados obtenidos en el código anterior. 
-
-# Empezamos con esto, y vemos, si terminamos mucho antes, agregamos alguna otra cosa para hacer extra
+## Contribuciones y comentarios
