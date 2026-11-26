@@ -5,16 +5,29 @@ import numpy as np
 # incluye el valor en el fin
 def interpolacion(x, y, comienzo=None, fin=None, espaciado=None):
     """
-    Interpola (x, y) con un spline cuadrático y lo evalúa en puntos
-    equiespaciados.
+    Interpola un set de datos (x, y) con un spline cuadrático y lo evalúa en puntos equiespaciados.
 
-    Evalúa desde `comienzo` cada `espaciado`, sin pasarse de `fin`, pero
-    incluyéndolo. Por defecto: comienzo=x[0], fin=x[-1],
-    espaciado=(fin-comienzo)/5.
-    Fuera del rango de `x` extrapola, así que esos valores pueden no ser
-    confiables.
+    El spline es una función formada por polinomios de grado 2 pegados entre sí, que pasa por
+    todos los puntos (x, y). Se evalúa desde comienzo cada espaciado, sin pasarse de fin pero
+    incluyéndolo si cae justo en un paso. Para que el último punto no se pierda por errores de
+    coma flotante, se le suma una tolerancia de 1e-9 al calcular la cantidad de pasos.
+    Si comienzo y fin coinciden, se evalúa solo en ese punto.
 
-    Devuelve (puntos, valores) como arrays de numpy.
+    Fuera del rango de x el spline extrapola, así que esos valores pueden no ser confiables.
+
+    Parámetros:
+        x, y : array
+            Datos a interpolar. Hacen falta al menos 3 puntos para el spline cuadrático.
+        comienzo : float, opcional
+            Valor de x donde empieza la evaluación. Por defecto, x[0].
+        fin : float, opcional
+            Valor de x donde termina la evaluación, incluido. Por defecto, x[-1].
+        espaciado : float, opcional
+            Paso entre los puntos de evaluación. Por defecto, (fin - comienzo) / 5.
+
+    Devuelve:
+        (puntos, valores) : tupla de arrays de numpy
+            Los puntos de evaluación y los valores del spline en ellos.
     """
 
     if comienzo is None:
