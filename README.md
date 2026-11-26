@@ -1,10 +1,5 @@
 # Thermo_pkg_nist_compare
 
-## Destacados
-* Busqueda de propiedades termodinámicas en el WebBook del NIST.
-* Estimación de propiedades termodinámicas mediante CoolProp.
-* Gráficos comparativos, interpolación y salidas en forma de tablas.
-
 ## Descripción
 Proyecto que facilita la comparación de datos termodinámicos de diferentes sustancias disponibles en forma gratuita en la [web del NIST](https://webbook.nist.gov/chemistry/fluid/), limitados a condición supercrítica, vapor sobrecalentado o equilibrio líquido-vapor, frente a los datos calculados con el paquete [CoolProp](https://coolprop.org/) de Python. Si la sustancia elegida es el agua, este último permite elegir entre dos tipos de variantes (IAPWS95 y IAPWS-97).
 
@@ -15,8 +10,39 @@ Este paquete corresponde al proyecto final del curso [Python Científico](https:
 * Carolina Cogo - https://github.com/caro-88
 * Carlos Luzi - https://github.com/cd-luzi
 
+## Destacados
+* Propiedades termodinámicas desde el WebBook del NIST, con construcción automatizada del link de búsqueda.
+* Ejemplos de aplicación del paquete CoolProp.
+* Exportación automática de gráficos comparativos, con interpolación para el suavizado de curvas.
+* Propiedades como tablas de Pandas modificada, para facil acceso e impresión en pantalla.
+
+## Instalación
+Se sugiere instalarlo empleando `uv`.
+
+Desde una carpeta local:
+
+```bash
+uv add ../thermo-pkg-nist-compare
+```
+
+Desde el repositorio de github:
+```bash
+uv add git+https://github.com/cd-luzi/thermo-pkg-nist-compare
+```
+
+### Verificación rápida del paquete:
+Se sugiere correr todos los ejemplos 1 a 4: con `uv run ./examples/ejemplo0x.py`, donde x es un número de 1 a 4, y verificar que no haya errores. Los ejemplos son:
+* [Ejemplo 01](examples/ejemplo01.py)
+* [Ejemplo 02](examples/ejemplo02.py)
+* [Ejemplo 03](examples/ejemplo03.py)
+* [Ejemplo 04](examples/ejemplo04.py)
+
+
 ## Modo de empleo
-Elección de sustancia (web) y búsqueda web:
+### Elección de sustancia (web) y búsqueda web
+
+
+_**Ejemplo básico**_:
 ```python
 >>> from thermo_pkg_nist_compare.datos_web_nist import busqueda_web_nist
 >>> from thermo_pkg_nist_compare.substancelist import Substance
@@ -36,7 +62,14 @@ Elección de sustancia (web) y búsqueda web:
 
 ```
 
-Graficadora de datos, con posibilidad de pasar por separado nombres y unidades.
+
+_**Ejemplos detallados en:**_:
+* [datos_nist_web_ejeplos_y_usos](examples/datos_nist_web_ejemplos_y_uso.ipynb)
+* [propdata_ejemplos_y_uso](examples/propdata_ejemplos_y_uso.ipynb)
+
+<br>
+
+
 
 ```py
 >>> from thermo_pkg_nist_compare.graficadora import graficar
@@ -48,18 +81,5 @@ Graficadora de datos, con posibilidad de pasar por separado nombres y unidades.
 
 Uso de CoolProp: se sufiere consultar la web oficial: [CoolProp](https://coolprop.org/)
 
-## Instalación
-Se sugiere instalarlo empleando `uv`.
-
-Desde una carpeta local:
-
-```bash
-uv add ../thermo-pkg-nist-compare
-```
-
-Desde el repositorio de github:
-```bash
-uv add git+https://github.com/cd-luzi/thermo-pkg-nist-compare
-```
 
 ## Contribuciones y comentarios
