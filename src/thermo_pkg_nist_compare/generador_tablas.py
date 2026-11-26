@@ -3,6 +3,7 @@ from .interpolacion import interpolacion
 from pathlib import Path
 import pandas as pd
 from great_tables import GT
+#probando
 
 #pip install great_tables
 def tabular(x, y, titulo_1="NIST", x_comp=None, y_comp=None, titulo_2="Otro",comienzo=None, fin=None, espaciado=None, decimales=3, nombre_x=None, nombre_y=None, unidad_x=None, unidad_y=None, interpolar=True):
