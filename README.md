@@ -30,6 +30,11 @@ Desde el repositorio de github:
 uv add git+https://github.com/cd-luzi/thermo-pkg-nist-compare
 ```
 
+Clonando el repositorio con:
+```bash
+git clone https://github.com/cd-luzi/thermo-pkg-nist-compare.git
+```
+
 ### Verificación rápida del paquete:
 Se sugiere correr todos los ejemplos 1 a 4: con `uv run ./examples/ejemplo0x.py`, donde x es un número de 1 a 4, y verificar que no haya errores. Los ejemplos son:
 * [Ejemplo 01](examples/ejemplo01.py)
@@ -39,8 +44,8 @@ Se sugiere correr todos los ejemplos 1 a 4: con `uv run ./examples/ejemplo0x.py`
 
 
 ## Modo de empleo
-### Elección de sustancia (web) y búsqueda web
 
+### Elección de sustancia (web) y búsqueda web
 
 _**Ejemplo básico**_:
 ```python
@@ -64,13 +69,15 @@ _**Ejemplo básico**_:
 
 
 _**Ejemplos detallados en:**_:
-* [datos_nist_web_ejeplos_y_usos](examples/datos_nist_web_ejemplos_y_uso.ipynb)
+* [datos_nist_web_ejeplos_y_uso](examples/datos_nist_web_ejemplos_y_uso.ipynb)
 * [propdata_ejemplos_y_uso](examples/propdata_ejemplos_y_uso.ipynb)
 
 <br>
 
 
+### Graficadora y otras aplicaciones
 
+_**Ejemplo básico**_:
 ```py
 >>> from thermo_pkg_nist_compare.graficadora import graficar
 >>> import numpy as np
@@ -79,7 +86,29 @@ _**Ejemplos detallados en:**_:
 >>> graficar(x, y, nombre_x="temperatura", nombre_y="presion", unidad_x="°C", unidad_y="Pa")
 ```
 
-Uso de CoolProp: se sufiere consultar la web oficial: [CoolProp](https://coolprop.org/)
+**Ejemplos detallados en:**_:
+* [graficadora_ejemplos_y_uso](examples/graficadora_ejemplos_y_uso.ipynb)
+* [generador_tablas_ejemplos_y_uso](examples/generador_tablas_ejemplos_y_uso.ipynb)
+* [interpolacion_ejemplos_y_uso](examples/interpolacion_ejemplos_y_uso.ipynb)
 
+<br>
+
+### Uso de CoolProp
+Para consultar todas las capacidades del paquete, se sugiere consultar la web oficial: [CoolProp](https://coolprop.org/).
+
+Para visualizar ejemplos más sencillos de interés para este paquete, ver los ejemplos específicos desarrollados a tal fin:
+* [coolprop_ejemplos_y_uso](examples/coolprop_ejemplos_y_uso.ipynb)
+
+### Otros paquetes termodinámicos
+Se dispone de un ejemplo básico analizando otros paquetes en:
+* [pkg_existentes_ejemplos_y_uso](examples/pkg_existentes_ejemplos_y_uso.ipynb)
+
+
+### Ejemplo completo de uso y comparación
+Puede consultar un ejemplo completo que involucra la consulta web y evaluación mediante CoolProp de propiedades del agua, así como la creación de diferentes gráficos comparativos, en:
+* [ejemplo_principal01](examples/ejemplo_principal01.ipynb)
+
+<br>
 
 ## Contribuciones y comentarios
+Si tiene algún comentario, puede contactarnos en forma directa o crear un `issue` o un `pull request` según sea necesario.
