@@ -2,8 +2,6 @@ from .interpolacion import interpolacion
 from pathlib import Path
 import pandas as pd
 from great_tables import GT
-#probando
-
 
 # pip install great_tables
 def tabular(
