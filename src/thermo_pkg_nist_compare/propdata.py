@@ -52,7 +52,7 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
     # Atributos personalizados que pandas conserva al crear copias o
     # subconjuntos. La tupla —("alias",)— evita usar una lista mutable
     # —["alias"]— como atributo de clase.
-    _metadata = ("alias", "unidades")
+    _metadata = ("alias", "unidades", "_catalogo_alias")
 
     def __init__(
         self, datos=None, encabezados=None, unidades=None, alias_base=None
@@ -62,6 +62,7 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
             super().__init__()
             self.alias = {}
             self.unidades = {}
+            self._catalogo_alias = {}
             return
 
         if isinstance(datos, pd.DataFrame):
@@ -75,6 +76,11 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
                     for alias, columna in aliases.items()
                     if columna in self.columns
                 }
+
+                catalogo_alias = getattr(datos, "_catalogo_alias", None)
+                if catalogo_alias is None:
+                    catalogo_alias = aliases
+                self._catalogo_alias = dict(catalogo_alias)
 
             if unidades is not None:
                 self.unidades = unidades
@@ -204,17 +210,22 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
     def _generate_aliases(self, encabezados, alias_base):
 
         if alias_base is None:
+            self._catalogo_alias = {}
             self.alias = {}
             return
 
-        aliases = {}
+        catalogo = {
+            nombre: clave
+            for clave, nombres in alias_base.items()
+            for nombre in nombres
+        }
 
-        for clave, nombres in alias_base.items():
-            if clave in encabezados:
-                for nombre in nombres:
-                    aliases[nombre] = clave
-
-        self.alias = aliases
+        self._catalogo_alias = catalogo
+        self.alias = {
+            nombre: clave
+            for nombre, clave in catalogo.items()
+            if clave in encabezados
+        }
 
     def __getitem__(self, keys):
 
@@ -232,6 +243,25 @@ class PropData(pd.DataFrame, metaclass=_PropDataHelpMeta):
             return result.to_numpy()
 
         return result
+
+    def __setitem__(self, key, value):
+        if isinstance(key, str):
+            key = self._catalogo_alias.get(key, key)
+        elif isinstance(key, list):
+            key = [
+                self._catalogo_alias.get(k, k) if isinstance(k, str) else k
+                for k in key
+            ]
+
+        super().__setitem__(key, value)
+
+        self.alias.update(
+            {
+                alias: columna
+                for alias, columna in self._catalogo_alias.items()
+                if columna in self.columns
+            }
+        )
 
 
 def main() -> None:
